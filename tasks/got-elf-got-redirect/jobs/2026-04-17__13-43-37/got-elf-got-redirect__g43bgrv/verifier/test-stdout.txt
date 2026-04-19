@@ -1,0 +1,332 @@
+Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8792 kB]
+Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [294 kB]
+Fetched 9347 kB in 17s (552 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  libcurl3-gnutls libcurl4
+The following packages will be upgraded:
+  curl libcurl3-gnutls libcurl4
+3 upgraded, 0 newly installed, 0 to remove and 88 not upgraded.
+Need to get 1093 kB of archives.
+After this operation, 1024 B disk space will be freed.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 curl amd64 7.88.1-10+deb12u14 [316 kB]
+Get:2 http://deb.debian.org/debian bookworm/main amd64 libcurl4 amd64 7.88.1-10+deb12u14 [392 kB]
+Get:3 http://deb.debian.org/debian bookworm/main amd64 libcurl3-gnutls amd64 7.88.1-10+deb12u14 [386 kB]
+Fetched 1093 kB in 8s (142 kB/s)
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 15602 files and directories currently installed.)
+Preparing to unpack .../curl_7.88.1-10+deb12u14_amd64.deb ...
+Unpacking curl (7.88.1-10+deb12u14) over (7.88.1-10+deb12u5) ...
+Preparing to unpack .../libcurl4_7.88.1-10+deb12u14_amd64.deb ...
+Unpacking libcurl4:amd64 (7.88.1-10+deb12u14) over (7.88.1-10+deb12u5) ...
+Preparing to unpack .../libcurl3-gnutls_7.88.1-10+deb12u14_amd64.deb ...
+Unpacking libcurl3-gnutls:amd64 (7.88.1-10+deb12u14) over (7.88.1-10+deb12u5) ...
+Setting up libcurl3-gnutls:amd64 (7.88.1-10+deb12u14) ...
+Setting up libcurl4:amd64 (7.88.1-10+deb12u14) ...
+Setting up curl (7.88.1-10+deb12u14) ...
+Processing triggers for libc-bin (2.36-9+deb12u13) ...
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+============================= test session starts ==============================
+platform linux -- Python 3.13.9, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 8 items
+
+../tests/test_outputs.py F...FFFF                                        [100%]
+
+=================================== FAILURES ===================================
+______________________ test_setup_builds_harness_binaries ______________________
+
+    def test_setup_builds_harness_binaries():
+        """Verify /app/setup.sh exists, is executable, and produces the harness ELF binaries."""
+        setup = Path("/app/setup.sh")
+        assert setup.is_file(), "/app/setup.sh must exist"
+        assert os.access(setup, os.X_OK), "/app/setup.sh must be executable"
+        proc = _run(["bash", str(setup)])
+>       assert proc.returncode == 0, f"setup.sh failed:\n{proc.stdout}\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         
+E         /usr/bin/ld: /tmp/cc0UASGz.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/cc0UASGz.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:28: AssertionError
+_______________ test_unpatched_binary_has_no_interception_banner _______________
+
+    def test_unpatched_binary_has_no_interception_banner():
+        """The linked harness must not print MALLOC INTERCEPTED before patching."""
+        _run(["bash", "/app/setup.sh"])
+>       proc = _run(["/app/test_program_with_wrapper"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/tests/test_outputs.py:12: in _run
+    return subprocess.run(
+/root/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/subprocess.py:554: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/subprocess.py:1039: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: 255 args: ['/app/test_program_with_wrapper']>
+args = ['/app/test_program_with_wrapper']
+executable = b'/app/test_program_with_wrapper', preexec_fn = None
+close_fds = True, pass_fds = (), cwd = '/app', env = None, startupinfo = None
+creationflags = 0, shell = False, p2cread = -1, p2cwrite = -1, c2pread = 12
+c2pwrite = 13, errread = 14, errwrite = 15, restore_signals = True, gid = None
+gids = None, uid = None, umask = -1, start_new_session = False
+process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       restore_signals,
+                       gid, gids, uid, umask,
+                       start_new_session, process_group):
+        """Execute program (POSIX version)"""
+    
+        if isinstance(args, (str, bytes)):
+            args = [args]
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = [args]
+        else:
+            args = list(args)
+    
+        if shell:
+            # On Android the default shell is at '/system/bin/sh'.
+            unix_shell = ('/system/bin/sh' if
+                      hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+            args = [unix_shell, "-c"] + args
+            if executable:
+                args[0] = executable
+    
+        if executable is None:
+            executable = args[0]
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        if (_USE_POSIX_SPAWN
+                and os.path.dirname(executable)
+                and preexec_fn is None
+                and (not close_fds or _HAVE_POSIX_SPAWN_CLOSEFROM)
+                and not pass_fds
+                and cwd is None
+                and (p2cread == -1 or p2cread > 2)
+                and (c2pwrite == -1 or c2pwrite > 2)
+                and (errwrite == -1 or errwrite > 2)
+                and not start_new_session
+                and process_group == -1
+                and gid is None
+                and gids is None
+                and uid is None
+                and umask < 0):
+            self._posix_spawn(args, executable, env, restore_signals, close_fds,
+                              p2cread, p2cwrite,
+                              c2pread, c2pwrite,
+                              errread, errwrite)
+            return
+    
+        orig_executable = executable
+    
+        # For transferring possible exec failure from child to parent.
+        # Data format: "exception name:hex errno:description"
+        # Pickle is not used; it is complex and involves memory allocation.
+        errpipe_read, errpipe_write = os.pipe()
+        # errpipe_write must not be in the standard io 0, 1, or 2 fd range.
+        low_fds_to_close = []
+        while errpipe_write < 3:
+            low_fds_to_close.append(errpipe_write)
+            errpipe_write = os.dup(errpipe_write)
+        for low_fd in low_fds_to_close:
+            os.close(low_fd)
+        try:
+            try:
+                # We must avoid complex work that could involve
+                # malloc or free in the child process to avoid
+                # potential deadlocks, thus we do all this here.
+                # and pass it to fork_exec()
+    
+                if env is not None:
+                    env_list = []
+                    for k, v in env.items():
+                        k = os.fsencode(k)
+                        if b'=' in k:
+                            raise ValueError("illegal environment variable name")
+                        env_list.append(k + b'=' + os.fsencode(v))
+                else:
+                    env_list = None  # Use execv instead of execve.
+                executable = os.fsencode(executable)
+                if os.path.dirname(executable):
+                    executable_list = (executable,)
+                else:
+                    # This matches the behavior of os._execvpe().
+                    executable_list = tuple(
+                        os.path.join(os.fsencode(dir), executable)
+                        for dir in os.get_exec_path(env))
+                fds_to_keep = set(pass_fds)
+                fds_to_keep.add(errpipe_write)
+                self.pid = _fork_exec(
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session,
+                        process_group, gid, gids, uid, umask,
+                        preexec_fn, _USE_VFORK)
+                self._child_created = True
+            finally:
+                # be sure the FD is closed no matter what
+                os.close(errpipe_write)
+    
+            self._close_pipe_fds(p2cread, p2cwrite,
+                                 c2pread, c2pwrite,
+                                 errread, errwrite)
+    
+            # Wait for exec to fail or succeed; possibly raising an
+            # exception (limited in size)
+            errpipe_data = bytearray()
+            while True:
+                part = os.read(errpipe_read, 50000)
+                errpipe_data += part
+                if not part or len(errpipe_data) > 50000:
+                    break
+        finally:
+            # be sure the FD is closed no matter what
+            os.close(errpipe_read)
+    
+        if errpipe_data:
+            try:
+                pid, sts = os.waitpid(self.pid, 0)
+                if pid == self.pid:
+                    self._handle_exitstatus(sts)
+                else:
+                    self.returncode = sys.maxsize
+            except ChildProcessError:
+                pass
+    
+            try:
+                exception_name, hex_errno, err_msg = (
+                        errpipe_data.split(b':', 2))
+                # The encoding here should match the encoding
+                # written in by the subprocess implementations
+                # like _posixsubprocess
+                err_msg = err_msg.decode()
+            except ValueError:
+                exception_name = b'SubprocessError'
+                hex_errno = b'0'
+                err_msg = 'Bad exception data from child: {!r}'.format(
+                              bytes(errpipe_data))
+            child_exception_type = getattr(
+                    builtins, exception_name.decode('ascii'),
+                    SubprocessError)
+            if issubclass(child_exception_type, OSError) and hex_errno:
+                errno_num = int(hex_errno, 16)
+                if err_msg == "noexec:chdir":
+                    err_msg = ""
+                    # The error must be from chdir(cwd).
+                    err_filename = cwd
+                elif err_msg == "noexec":
+                    err_msg = ""
+                    err_filename = None
+                else:
+                    err_filename = orig_executable
+                if errno_num != 0:
+                    err_msg = os.strerror(errno_num)
+                if err_filename is not None:
+>                   raise child_exception_type(errno_num, err_msg, err_filename)
+E                   FileNotFoundError: [Errno 2] No such file or directory: '/app/test_program_with_wrapper'
+
+/root/.local/share/uv/python/cpython-3.13.9-linux-x86_64-gnu/lib/python3.13/subprocess.py:1972: FileNotFoundError
+__________________ test_patch_then_run_shows_many_intercepts ___________________
+
+    def test_patch_then_run_shows_many_intercepts():
+        """After patching, the output must include many MALLOC INTERCEPTED lines (>=100)."""
+        _run(["bash", "/app/setup.sh"])
+        assert _run(["go", "build", "-o", "/app/got-patch", "./cmd/got-patch"]).returncode == 0
+        patch = _run(
+            ["/app/got-patch", "/app/test_program_with_wrapper", "/app/test_program_patched", "logged_malloc"]
+        )
+>       assert patch.returncode == 0, f"patch failed:\n{patch.stdout}\n{patch.stderr}"
+E       AssertionError: patch failed:
+E         
+E         error: open /app/test_program_with_wrapper: no such file or directory
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/app/got-patch', '/app/test_program_with_wrapper', '/app/test_program_patched', 'logged_malloc'], returncode=1, stdout='', stderr='error: open /app/test_program_with_wrapper: no such file or directory\n').returncode
+
+/tests/test_outputs.py:74: AssertionError
+_____________ test_patched_binary_permissions_and_header_unchanged _____________
+
+    def test_patched_binary_permissions_and_header_unchanged():
+        """Output ELF must be executable; first 64 bytes of ELF header must match input."""
+        _run(["bash", "/app/setup.sh"])
+        assert _run(["go", "build", "-o", "/app/got-patch", "./cmd/got-patch"]).returncode == 0
+>       assert (
+            _run(
+                ["/app/got-patch", "/app/test_program_with_wrapper", "/app/test_program_patched", "logged_malloc"]
+            ).returncode
+            == 0
+        )
+E       AssertionError: assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/app/got-patch', '/app/test_program_with_wrapper', '/app/test_program_patched', 'logged_malloc'], returncode=1, stdout='', stderr='error: open /app/test_program_with_wrapper: no such file or directory\n').returncode
+E        +    where CompletedProcess(args=['/app/got-patch', '/app/test_program_with_wrapper', '/app/test_program_patched', 'logged_malloc'], returncode=1, stdout='', stderr='error: open /app/test_program_with_wrapper: no such file or directory\n') = _run(['/app/got-patch', '/app/test_program_with_wrapper', '/app/test_program_patched', 'logged_malloc'])
+
+/tests/test_outputs.py:89: AssertionError
+______________________ test_missing_wrapper_reports_error ______________________
+
+    def test_missing_wrapper_reports_error():
+        """Unknown wrapper symbol must yield a non-zero exit and an explanatory message."""
+        _run(["bash", "/app/setup.sh"])
+        assert _run(["go", "build", "-o", "/app/got-patch", "./cmd/got-patch"]).returncode == 0
+        proc = _run(
+            [
+                "/app/got-patch",
+                "/app/test_program_with_wrapper",
+                "/app/out_bad",
+                "definitely_missing_symbol_zzzzz",
+            ]
+        )
+        assert proc.returncode != 0
+        msg = (proc.stdout + proc.stderr).lower()
+>       assert "not found" in msg or "missing" in msg or "no relocations" in msg
+E       AssertionError: assert ('not found' in 'error: open /app/test_program_with_wrapper: no such file or directory\n' or 'missing' in 'error: open /app/test_program_with_wrapper: no such file or directory\n' or 'no relocations' in 'error: open /app/test_program_with_wrapper: no such file or directory\n')
+
+/tests/test_outputs.py:116: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_got_patch_binary_builds
+PASSED ../tests/test_outputs.py::test_source_does_not_use_debug_elf
+PASSED ../tests/test_outputs.py::test_patcher_cli_requires_arguments
+FAILED ../tests/test_outputs.py::test_setup_builds_harness_binaries - Asserti...
+FAILED ../tests/test_outputs.py::test_unpatched_binary_has_no_interception_banner
+FAILED ../tests/test_outputs.py::test_patch_then_run_shows_many_intercepts - ...
+FAILED ../tests/test_outputs.py::test_patched_binary_permissions_and_header_unchanged
+FAILED ../tests/test_outputs.py::test_missing_wrapper_reports_error - Asserti...
+========================= 5 failed, 3 passed in 9.09s ==========================

@@ -1,0 +1,198 @@
+New Terminal Output:
+
+root@jour-VMware-Virtual-Platform:/app# cat > /app/CMakeLists.txt <<'EOF'
+> cmake_minimum_required(VERSION 3.16)
+> project(CryptoEngine CXX)
+>
+> add_subdirectory(core)
+> add_subdirectory(engine)
+> add_subdirectory(plugin)
+> add_subdirectory(app)
+> EOF
+root@jour-VMware-Virtual-Platform:/app# cat > /app/core/CMakeLists.txt <<'EOF'
+> add_library(core STATIC core.cpp)
+>
+> target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+> target_compile_features(core PUBLIC cxx_std_17)
+> EOF
+root@jour-VMware-Virtual-Platform:/app# cat > /app/engine/CMakeLists.txt <<'EOF'
+> find_package(Threads REQUIRED)
+>
+> add_library(engine STATIC engine.cpp)
+>
+> target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+> target_link_libraries(engine PUBLIC core Threads::Threads)
+> target_compile_features(engine PUBLIC cxx_std_20)
+> EOF
+root@jour-VMware-Virtual-Platform:/app# cat > /app/plugin/CMakeLists.txt <<'EOF'
+> add_library(plugin OBJECT plugin.cpp)
+>
+> target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+> target_compile_features(plugin PUBLIC cxx_std_17)
+> EOF
+root@jour-VMware-Virtual-Platform:/app# cat > /app/app/CMakeLists.txt <<'EOF'
+> configure_file(
+>     ${CMAKE_CURRENT_SOURCE_DIR}/build_profile.h.in
+>     ${CMAKE_CURRENT_BINARY_DIR}/build_profile.h
+>     @ONLY
+> )
+>
+> add_executable(myapp main.cpp)
+> target_include_directories(myapp PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+> target_link_libraries(myapp PRIVATE engine)
+> target_sources(myapp PRIVATE $<TARGET_OBJECTS:plugin>)
+> target_compile_features(myapp PRIVATE cxx_std_20)
+>
+> add_executable(selfcheck selfcheck.cpp)
+> target_include_directories(selfcheck PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+> target_link_libraries(selfcheck PRIVATE engine)
+> target_sources(selfcheck PRIVATE $<TARGET_OBJECTS:plugin>)
+> target_compile_features(selfcheck PRIVATE cxx_std_20)
+> EOF
+root@jour-VMware-Virtual-Platform:/app# rm -rf /tmp/build-debug /tmp/build-release /tmp/build-ninja-debug /tmp/build-ninja-release
+root@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-debug
+root@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-debug
+[ 11%] Building CXX object core/CMakeFiles/core.dir/core.cpp.o
+/tmp/build-debug/app/myapp
+[ 22%] Linking CXX static library libcore.a
+[ 22%] Built target core
+[ 33%] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o
+[ 44%] Linking CXX static library libengine.a
+/tmp/build-debug/app/selfcheck
+[ 44%] Built target engine
+[ 55%] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o
+[ 55%] Built target plugin
+[ 66%] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o
+/app/app/main.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+cmake -S /app -B /tmp/build-release -DCMAKE_BUILD_TYPE=Release
+gmake[2]: *** [app/CMakeFiles/myapp.dir/build.make:76: app/CMakeFiles/myapp.dir/main.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:234: app/CMakeFiles/myapp.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/myapp
+bash: /tmp/build-debug/app/myapp: No such file or directory
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/selfcheck
+bash: /tmp/build-debug/app/selfcheck: No such file or directory
+root@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-release -DCMAKE_BUILD_TYPE=Release
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-release
+root@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-release
+[ 11%] Building CXX object core/CMakeFiles/core.dir/core.cpp.o
+[ 22%] Linking CXX static library libcore.a
+[ 22%] Built target core
+[ 33%] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o
+/tmp/build-release/app/myapp
+[ 44%] Linking CXX static library libengine.a
+[ 44%] Built target engine
+[ 55%] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o
+/tmp/build-release/app/selfcheck
+[ 55%] Built target plugin
+cmake -S 
+[... output limited to 10000 bytes; 69 interior bytes omitted ...]
+* [CMakeFiles/Makefile2:234: app/CMakeFiles/myapp.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/myapp
+bash: /tmp/build-release/app/myapp: No such file or directory
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/selfcheck
+bash: /tmp/build-release/app/selfcheck: No such file or directory
+root@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-ninja-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-ninja-debug
+root@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-ninja-debug
+[1/9] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o
+FAILED: app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o
+/usr/bin/c++  -I/tmp/build-ninja-debug/app -I/app/engine -I/app/core -g -std=gnu++20 -MD -MT app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -MF app/CMakeFiles/sel
+fcheck.dir/selfcheck.cpp.o.d -o app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -c /app/app/selfcheck.cpp
+/app/app/selfcheck.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[2/9] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o
+FAILED: app/CMakeFiles/myapp.dir/main.cpp.o
+/usr/bin/c++  -I/tmp/build-ninja-debug/app -I/app/engine -I/app/core -g -std=gnu++20 -MD -MT app/CMakeFiles/myapp.dir/main.cpp.o -MF app/CMakeFiles/myapp.dir/ma
+in.cpp.o.d -o app/CMakeFiles/myapp.dir/main.cpp.o -c /app/app/main.cpp
+/app/app/main.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[4/9] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o/tmp/build-ninja-debug/app/myapp
+/tmp/build-ninja-debug/app/selfcheck
+cmake -S /app -B /tmp/build-ninja-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+[5/9] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o
+ninja: build stopped: subcommand failed.
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-debug/app/myapp
+bash: /tmp/build-ninja-debug/app/myapp: No such file or directory
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-debug/app/selfcheck
+bash: /tmp/build-ninja-debug/app/selfcheck: No such file or directory
+root@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-ninja-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-ninja-release
+root@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-ninja-release
+[1/9] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o
+FAILED: app/CMakeFiles/myapp.dir/main.cpp.o
+/usr/bin/c++  -I/tmp/build-ninja-release/app -I/app/engine -I/app/core -O3 -DNDEBUG -std=gnu++20 -MD -MT app/CMakeFiles/myapp.dir/main.cpp.o -MF app/CMakeFiles/
+myapp.dir/main.cpp.o.d -o app/CMakeFiles/myapp.dir/main.cpp.o -c /app/app/main.cpp
+/app/app/main.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[2/9] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o
+FAILED: app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o
+/usr/bin/c++  -I/tmp/build-ninja-release/app -I/app/engine -I/app/core -O3 -DNDEBUG -std=gnu++20 -MD -MT app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -MF app/CM
+akeFiles/selfcheck.dir/selfcheck.cpp.o.d -o app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -c /app/app/selfcheck.cpp
+/app/app/selfcheck.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[4/9] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o/tmp/build-ninja-release/app/myapp
+[5/9] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o
+ninja: build stopped: subcommand failed.
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-release/app/myapp
+bash: /tmp/build-ninja-release/app/myapp: No such file or directory
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-release/app/selfcheck
+bash: /tmp/build-ninja-release/app/selfcheck: No such file or directory
+root@jour-VMware-Virtual-Platform:/app#

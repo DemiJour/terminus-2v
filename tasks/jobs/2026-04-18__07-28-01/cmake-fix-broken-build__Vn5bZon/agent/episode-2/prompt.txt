@@ -1,0 +1,126 @@
+New Terminal Output:
+
+root@jour-VMware-Virtual-Platform:/app# find . -maxdepth 2 -type f \( -name '*.cpp' -o -name '*.h' \) -print
+./app/selfcheck.cpp
+./app/main.cpp
+./plugin/plugin.cpp
+./plugin/plugin.h
+./engine/engine.cpp
+./engine/engine.h
+./core/core.cpp
+./core/core.h
+root@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' app/main.cpp
+#include <iostream>
+#include "engine.h"
+#include "plugin.h"
+#include "build_profile.h"
+
+int main() {
+    auto result = engine::validate("hello");
+    if (result.has_value()) {
+        auto [text, h] = engine::process("hello");
+        std::cout << "text: " << text << "\n";
+        std::cout << "hash: " << to_hex(h) << "\n";
+        if constexpr (sizeof(int) >= 4) {
+            std::cout << "valid: yes\n";
+        }
+        std::cout << banner(std::string(build_profile())) << "\n";
+    }
+    return 0;
+}
+root@jour-VMware-Virtual-Platform:/app# ls -la app
+total 28
+drwxr-xr-x 1 root root 4096 Apr 18 11:25 .
+drwxr-xr-x 1 root root 4096 Apr 18 11:25 ..
+-rw-r--r-- 1 root root   75 Apr 18 11:25 CMakeLists.txt
+-rw-r--r-- 1 root root  114 Apr 18 11:25 build_profile.h.in
+-rw-r--r-- 1 root root  508 Apr 18 11:25 main.cpp
+-rw-r--r-- 1 root root  442 Apr 18 11:25 selfcheck.cpp
+root@jour-VMware-Virtual-Platform:/app# grep -RIn "selfcheck" -n .
+./app/selfcheck.cpp:21:    std::cout << "selfcheck: ok (" << build_profile() << ")\n";
+root@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' app/build_profile.h.in
+#pragma once
+#include <string_view>
+
+inline std::string_view build_profile() {
+    return "@CMAKE_BUILD_TYPE@";
+}
+root@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' engine/engine.cpp
+#include "engine.h"
+#include "core.h"
+#include <algorithm>
+#include <cctype>
+#include <span>
+#include <thread>
+
+namespace {
+bool has_nonzero(std::span<const int> values) {
+    for (int value : values) {
+        if (value != 0) {
+            return true;
+        }
+    }
+    return false;
+}
+}
+
+namespace engine {
+std::tuple<std::string, int> process(const std::string& input) {
+    auto encoded = core::encode(input);
+    auto decoded = core::decode(encoded);
+    int h = static_cast<int>(core::hash(decoded));
+
+    std::string upper(decoded.size(), '\0');
+    std::thread worker([&]() {
+        std::transform(decoded.begin(), decoded.end(), upper.begin(), [](unsigned char c) {
+            return static_cast<char>(std::toupper(c));
+        });
+    });
+    worker.join();
+
+    if (!has_nonzero(std::span<const int>(encoded.data(), encoded.size()))) {
+        return {upper, h};
+    }
+    return {upper, h};
+}
+
+std::optional<std::string> validate(const std::string& input) {
+    if (input.empty()) {
+        return std::nullopt;
+    }
+    auto [text, h] = process(input);
+    if (h == 0) {
+        return std::nullopt;
+    }
+    return text;
+}
+}
+root@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' engine/engine.h
+#pragma once
+#include <optional>
+#include <string>
+#include <tuple>
+
+namespace engine {
+std::tuple<std::string, int> process(const std::string& input);
+std::optional<std::string> validate(const std::string& input);
+}
+root@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' core/core.h
+#pragma once
+#include <cstdint>
+#include <string>
+#include <string_view>
+#include <vector>
+
+namespace core {
+std::uint32_t hash(std::string_view s);
+std::vector<int> encode(std::string_view s);
+std::string decode(const std::vector<int>& v);
+}
+root@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' plugin/plugin.h
+#pragma once
+#include <string>
+
+std::string to_hex(int value);
+std::string banner(const std::string& profile);
+root@jour-VMware-Virtual-Platform:/app#

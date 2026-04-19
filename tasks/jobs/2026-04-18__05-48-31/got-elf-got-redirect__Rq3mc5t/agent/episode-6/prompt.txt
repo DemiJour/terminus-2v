@@ -1,0 +1,21 @@
+New Terminal Output:
+
+root@e2f2137e227f:/app# go version
+go version go1.19.8 linux/amd64
+root@e2f2137e227f:/app# cd /app && go build -o /app/got-patch ./cmd/got-patch
+/app/test_program_with_wrapper 2>&1 | grep -c 'MALLOC INTERCEPTED' || true
+/app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+stat -c '%a %n' /app/test_program_patched
+cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix(64) identical'
+/app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED' || true
+root@e2f2137e227f:/app# /app/test_program_with_wrapper 2>&1 | grep -c 'MALLOC INTERCEPTED' || true
+0
+root@e2f2137e227f:/app# /app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+error: read relocation section .rela.dyn: read /app/test_program_patched: bad file descriptor
+root@e2f2137e227f:/app# stat -c '%a %n' /app/test_program_patched
+755 /app/test_program_patched
+root@e2f2137e227f:/app# cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix(64) identical'
+ELF header prefix(64) identical
+root@e2f2137e227f:/app# /app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED' || true
+0
+root@e2f2137e227f:/app#

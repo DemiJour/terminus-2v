@@ -1,0 +1,839 @@
+[?2004hroot@d232793eb959:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@d232793eb959:/app# clear
+[?2004l[H[J[3J[?2004hroot@d232793eb959:/app# ls -la
+[?2004ltotal 36
+drwxr-xr-x 1 root root 4096 Apr 18 00:45 .
+drwxr-xr-x 1 root root 4096 Apr 18 10:48 ..
+drwxrwxr-x 3 root root 4096 Apr 17 07:33 cmd
+-rw-rw-r-- 1 root root   25 Apr 18 00:09 go.mod
+drwxrwxr-x 3 root root 4096 Apr 17 07:34 internal
+-rw-rw-r-- 1 root root  480 Apr 18 00:09 malloc_wrapper.c
+-rwxrwxr-x 1 root root 1014 Apr 18 00:45 setup.sh
+-rw-rw-r-- 1 root root  793 Apr 18 00:09 test_program.c
+[?2004hroot@d232793eb959:/app# cat /app/go.mod
+[?2004lmodule gotpatch
+
+go 1.22
+[?2004hroot@d232793eb959:/app# find /app -maxdepth 3 -type d -print
+[?2004l/app
+/app/cmd
+/app/cmd/got-patch
+/app/internal
+/app/internal/chaff
+[?2004hroot@d232793eb959:/app# find /app/cmd -maxdepth 3 -type f -print
+[?2004l/app/cmd/got-patch/main.go
+[?2004hroot@d232793eb959:/app# sed -n '1,200p' /app/cmd/got-patch/main.go
+[?2004lpackage main
+
+import (
+	"fmt"
+	"os"
+
+	_ "gotpatch/internal/chaff"
+)
+
+func main() {
+	if len(os.Args) < 3 {
+		fmt.Fprintf(os.Stderr, "usage: %s <input_elf> <output_elf> [wrapper_symbol]\n", os.Args[0])
+		os.Exit(2)
+	}
+	fmt.Fprintf(os.Stderr, "got-patch: not implemented — replace this file with a working ELF64 LE patcher.\n")
+	os.Exit(1)
+}
+[?2004hroot@d232793eb959:/app# mkdir -p /app/cmd/got-patch
+[?2004l[?2004hroot@d232793eb959:/app# cat > /app/cmd/got-patch/main.go <<'EOF'
+[?2004l[?2004h> package main
+[?2004l[?2004h> 
+[?2004l[?2004h> import (
+[?2004l[?2004h> "bytes"
+[?2004l[?2004h> "encoding/binary"
+[?2004l[?2004h> "errors"
+[?2004l[?2004h> "fmt"
+[?2004l[?2004h> "io"
+[?2004l[?2004h> "os"
+[?2004l[?2004h> "path/filepath"
+[?2004l[?2004h> )
+[?2004l[?2004h> 
+[?2004l[?2004h> // Minimal 64-bit little-endian ELF layout code (no debug/elf).
+[?2004l[?2004h> 
+[?2004l[?2004h> const (
+[?2004l[?2004h> EI_NIDENT = 16
+[?2004l[?2004h> 
+[?2004l[?2004h> ELFCLASS64 = 2
+[?2004l[?2004h> ELFDATA2LSB = 1
+[?2004l[?2004h> 
+[?2004l[?2004h> SHT_NULL     = 0
+[?2004l[?2004h> SHT_SYMTAB   = 2
+[?2004l[?2004h> SHT_STRTAB   = 3
+[?2004l[?2004h> SHT_RELA     = 4
+[?2004l[?2004h> SHT_DYNSYM   = 11
+[?2004l[?2004h> 
+[?2004l[?2004h> SHN_UNDEF = 0
+[?2004l[?2004h> )
+[?2004l[?2004h> 
+[?2004l[?2004h> type elf64Ehdr struct {
+[?2004l[?2004h> Ident     [EI_NIDENT]byte
+[?2004l[?2004h> Type      uint16
+[?2004l[?2004h> Machine   uint16
+[?2004l[?2004h> Version   uint32
+[?2004l[?2004h> Entry     uint64
+[?2004l[?2004h> Phoff     uint64
+[?2004l[?2004h> Shoff     uint64
+[?2004l[?2004h> Flags     uint32
+[?2004l[?2004h> Ehsize    uint16
+[?2004l[?2004h> Phentsize uint16
+[?2004l[?2004h> Phnum     uint16
+[?2004l[?2004h> Shentsize uint16
+[?2004l[?2004h> Shnum     uint16
+[?2004l[?2004h> Shstrndx  uint16
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> type elf64Shdr struct {
+[?2004l[?2004h> Name      uint32
+[?2004l[?2004h> Type      uint32
+[?2004l[?2004h> Flags     uint64
+[?2004l[?2004h> Addr      uint64
+[?2004l[?2004h> Off       uint64
+[?2004l[?2004h> Size      uint64
+[?2004l[?2004h> Link      uint32
+[?2004l[?2004h> Info      uint32
+[?2004l[?2004h> Addralign uint64
+[?2004l[?2004h> Entsize   uint64
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> type elf64Sym struct {
+[?2004l[?2004h> Name  uint32
+[?2004l[?2004h> Info  byte
+[?2004l[?2004h> Other byte
+[?2004l[?2004h> Shndx uint16
+[?2004l[?2004h> Value uint64
+[?2004l[?2004h> Size  uint64
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> type elf64Rela struct {
+[?2004l[?2004h> Off    uint64
+[?2004l[?2004h> Info   uint64
+[?2004l[?2004h> Addend int64
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func relaSym(info uint64) uint32  { return uint32(info >> 32) }
+[?2004l[?2004h> func relaType(info uint64) uint32 { return uint32(info & 0xffffffff) }
+[?2004l[?2004h> func makeRelaInfo(sym uint32, typ uint32) uint64 {
+[?2004l[?2004h> return (uint64(sym) << 32) | uint64(typ)
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func readAtFull(f *os.File, off int64, size int) ([]byte, error) {
+[?2004l[?2004h> b := make([]byte, size)
+[?2004l[?2004h> if _, err := f.ReadAt(b, off); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, err
+[?2004l[?2004h> }
+[?2004l[?2004h> return b, nil
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func readStructAt[T any](f *os.File, off int64, out *T) error {
+[?2004l[?2004h> var sz int
+[?2004l[?2004h> sz = binary.Size(*out)
+[?2004l[?2004h> b, err := readAtFull(f, off, sz)
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> return binary.Read(bytes.NewReader(b), binary.LittleEndian, out)
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func readCString(tab []byte, off uint32) string {
+[?2004l[?2004h> if int(off) >= len(tab) {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return ""
+[?2004l[?2004h> }
+[?2004l[?2004h> p := tab[off:]
+[?2004l[?2004h> if i := bytes.IndexByte(p, 0); i >= 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return string(p[:i])
+[?2004l[?2004h> }
+[?2004l[?2004h> return string(p)
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> type section struct {
+[?2004l[?2004h> hdr  elf64Shdr
+[?2004l[?2004h> name string
+[?2004l[?2004h> idx  int
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> type dynsym struct {
+[?2004l[?2004h> idx  int
+[?2004l[?2004h> sym  elf64Sym
+[?2004l[?2004h> name string
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func loadSections(f *os.File, eh elf64Ehdr) ([]section, []byte, error) {
+[?2004l[?2004h> if eh.Shentsize == 0 || eh.Shnum == 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, errors.New("no section headers")
+[?2004l[?2004h> }
+[?2004l[?2004h> if eh.Shentsize != uint16(binary.Size(elf64Shdr{})) {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, fmt.Errorf("unexpected section header size: %d", eh.Shentsize)
+[?2004l[?2004h> }
+[?2004l[?2004h> shdrs := make([]elf64Shdr, int(eh.Shnum))
+[?2004l[?2004h> for i := 0; i < int(eh.Shnum); i++ {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if err := readStructAt(f, int64(eh.Shoff)+int64(i)*int64(eh.Shentsize), &shdrs[i]); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, fmt.Errorf("read shdr[%d]: %w", i, err)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> }
+[?2004l[?2004h> if int(eh.Shstrndx) >= len(shdrs) {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, fmt.Errorf("invalid e_shstrndx %d", eh.Shstrndx)
+[?2004ls.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
+		return err
+	}
+	outF, err := os.OpenFile(outPath, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0755)
+	if err != nil {
+		return err
+	}
+	defer outF.Close()
+	if _, err := inF.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+	if _, err := io.Copy(outF, inF); err ![?2004h> }
+[?2004l[?2004h> shstr := shdrs[eh.Shstrndx]
+[?2004l[?2004h> if shstr.Type != SHT_STRTAB {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, fmt.Errorf("section header string table is not STRTAB (type=%d)", shstr.Type)
+[?2004l[?2004h> }
+[?2004l[?2004h> shstrtab, err := readAtFull(f, int64(shstr.Off), int(shstr.Size))
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, fmt.Errorf("read .shstrtab: %w", err)
+[?2004l[?2004h> }
+[?2004l[?2004h> secs := make([]section, len(shdrs))
+[?2004l[?2004h> for i := range shdrs {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> secs[i] = section{hdr: shdrs[i], name: readCString(shstrtab, shdrs[i].Name), idx: i}
+[?2004l[?2004h> }
+[?2004l[?2004h> return secs, shstrtab, nil
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func findSection(secs []section, name string) *section {
+[?2004l[?2004h> for i := range secs {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if secs[i].name == name {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return &secs[i]
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> }
+[?2004l[?2004h> return nil
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func loadDynsym(f *os.File, secs []section) ([]dynsym, []byte, *section, *section, error) {
+[?2004l[?2004h> dyn := findSection(secs, ".dynsym")
+[?2004l[?2004h> if dyn == nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, errors.New("missing .dynsym")
+[?2004l[?2004h> }
+[?2004l[?2004h> if dyn.hdr.Type != SHT_DYNSYM {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, fmt.Errorf(".dynsym wrong type: %d", dyn.hdr.Type)
+[?2004l[?2004h> }
+[?2004l[?2004h> if dyn.hdr.Entsize == 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, errors.New(".dynsym entsize is 0")
+[?2004l[?2004h> }
+[?2004l[?2004h> if dyn.hdr.Entsize != uint64(binary.Size(elf64Sym{})) {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, fmt.Errorf("unexpected .dynsym entsize: %d", dyn.hdr.Entsize)
+[?2004l[?2004h> }
+[?2004l[?2004h> // Link points to the associated string table (.dynstr)
+[?2004l[?2004h> if int(dyn.hdr.Link) >= len(secs) {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, fmt.Errorf(".dynsym sh_link out of range: %d", dyn.hdr.Link)
+[?2004l[?2004h> }
+[?2004l[?2004h> dynstrSec := &secs[dyn.hdr.Link]
+[?2004l[?2004h> if dynstrSec.hdr.Type != SHT_STRTAB {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, fmt.Errorf(".dynsym link section is not STRTAB (type=%d)", dynstrSec.hdr.Type)
+[?2004ltes(), off); err != nil {
+					return fmt.Errorf("write rela %s[%d]: %w", sec.name, i, err)
+				}
+				patched++
+			}
+		}
+	}
+
+	if patched == 0 {
+		return fmt.Errorf("no applicable RELA relocations referenced symbol malloc (idx=%d); nothing patched", mallocIdx)
+	}
+	fmt.Fprint[?2004h> }
+[?2004l[?2004h> dynstr, err := readAtFull(f, int64(dynstrSec.hdr.Off), int(dynstrSec.hdr.Size))
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, fmt.Errorf("read .dynstr: %w", err)
+[?2004l[?2004h> }
+[?2004l[?2004h> count := int(dyn.hdr.Size / dyn.hdr.Entsize)
+[?2004l[?2004h> syms := make([]dynsym, 0, count)
+[?2004l[?2004h> for i := 0; i < count; i++ {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> var s elf64Sym
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> off := int64(dyn.hdr.Off) + int64(i)*int64(dyn.hdr.Entsize)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if err := readStructAt(f, off, &s); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return nil, nil, nil, nil, fmt.Errorf("read dynsym[%d]: %w", i, err)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> name := readCString(dynstr, s.Name)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> syms = append(syms, dynsym{idx: i, sym: s, name: name})
+[?2004l[?2004h> }
+[?2004l[?2004h> return syms, dynstr, dyn, dynstrSec, nil
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func patchRelocations(inPath, outPath, wrapper string) error {
+[?2004l[?2004h> inF, err := os.Open(inPath)
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> defer inF.Close()
+[?2004l[?2004h> 
+[?2004l[?2004h> st, err := inF.Stat()
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> size := st.Size()
+[?2004l[?2004h> if size < 64 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("file too small to be ELF64: %d bytes", size)
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Read ELF header but do not modify first 64 bytes.
+[?2004l[?2004h> var eh elf64Ehdr
+[?2004l[?2004h> if err := readStructAt(inF, 0, &eh); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("read ELF header: %w", err)
+[?2004l[?2004h> }
+[?2004l[?2004h> if eh.Ident[0] != 0x7f || eh.Ident[1] != 'E' || eh.Ident[2] != 'L' || eh.Ident[3] != 'F' {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return errors.New("not an ELF file")
+[?2004l[?2004h> }
+[?2004l[?2004h> if eh.Ident[4] != ELFCLASS64 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("unsupported ELF class: %d", eh.Ident[4])
+[?2004l[?2004h> }
+[?2004l[?2004h> if eh.Ident[5] != ELFDATA2LSB {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("unsupported ELF data encoding: %d", eh.Ident[5])
+[?2004l[?2004h> }
+[?2004l[?2004h> if eh.Shoff == 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return errors.New("missing section header table")
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> secs, _, err := loadSections(inF, eh)
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> dynsyms, _, _, _, err := loadDynsym(inF, secs)
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> mallocIdx := -1
+[?2004l[?2004h> wrapperIdx := -1
+[?2004l[?2004h> for _, s := range dynsyms {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if s.name == "malloc" {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> mallocIdx = s.idx
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if s.name == wrapper {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> wrapperIdx = s.idx
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> }
+[?2004l[?2004h> if wrapperIdx < 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("wrapper symbol not found in .dynsym: %s", wrapper)
+[?2004l[?2004h> }
+[?2004l[?2004h> if mallocIdx < 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("target symbol not found in .dynsym: malloc")
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> fmt.Fprintf(os.Stderr, "dynsym: malloc idx=%d, %s idx=%d\n", mallocIdx, wrapper, wrapperIdx)
+[?2004l[?2004h> 
+[?2004l[?2004h> // Copy input to output first (preserve all bytes), then patch in-place.
+[?2004l[?2004h> if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> outF, err := os.OpenFile(outPath, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0755)
+[?2004l[?2004h> if err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> defer outF.Close()
+[?2004l[?2004h> if _, err := inF.Seek(0, io.SeekStart); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> if _, err := io.Copy(outF, inF); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> if err := outF.Chmod(0755); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> patched := 0
+[?2004l[?2004h> for _, sec := range secs {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if sec.hdr.Type != SHT_RELA {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> continue
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if sec.hdr.Entsize == 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> continue
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if sec.hdr.Entsize != uint64(binary.Size(elf64Rela{})) {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> continue
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> count := int(sec.hdr.Size / sec.hdr.Entsize)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if count == 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> continue
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> // Many relocation sections that refer to dynsym will have sh_link == dynsym index.
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if int(sec.hdr.Link) >= len(secs) {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> continue
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if secs[sec.hdr.Link].name != ".dynsym" {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> continue
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> for i := 0; i < count; i++ {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> var r elf64Rela
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> off := int64(sec.hdr.Off) + int64(i)*int64(sec.hdr.Entsize)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if err := readStructAt(outF, off, &r); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("read rela %s[%d]: %w", sec.name, i, err)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> sym := relaSym(r.Info)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> typ := relaType(r.Info)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if int(sym) == mallocIdx {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> newInfo := makeRelaInfo(uint32(wrapperIdx), typ)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> fmt.Fprintf(os.Stderr, "patch relocation: section=%s index=%d r_offset=0x%x type=%d sym=%d(malloc)->%d(%s)\n",
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> sec.name, i, r.Off, typ, mallocIdx, wrapperIdx, wrapper)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> r.Info = newInfo
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> var buf bytes.Buffer
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if err := binary.Write(&buf, binary.LittleEndian, &r); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return err
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> if _, err := outF.WriteAt(buf.Bytes(), off); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("write rela %s[%d]: %w", sec.name, i, err)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> patched++
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> }
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> if patched == 0 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> return fmt.Errorf("no applicable RELA relocations referenced symbol malloc (idx=%d); nothing patched", mallocIdx)
+[?2004l[?2004h> }
+[?2004l[?2004h> fmt.Fprintf(os.Stderr, "patched %d relocation(s) targeting malloc -> %s\n", patched, wrapper)
+[?2004l[?2004h> return nil
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func usage() {
+[?2004l[?2004h> fmt.Fprintf(os.Stderr, "usage: got-patch <input_elf> <output_elf> [wrapper_symbol]\n")
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> func main() {
+[?2004l[?2004h> if len(os.Args) != 3 && len(os.Args) != 4 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> usage()
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> os.Exit(2)
+[?2004l[?2004h> }
+[?2004l[?2004h> inPath := os.Args[1]
+[?2004l[?2004h> outPath := os.Args[2]
+[?2004l[?2004h> wrapper := "logged_malloc"
+[?2004l[?2004h> if len(os.Args) == 4 {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> wrapper = os.Args[3]
+[?2004l[?2004h> }
+[?2004l[?2004h> if err := patchRelocations(inPath, outPath, wrapper); err != nil {
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> fmt.Fprintf(os.Stderr, "error: %v\n", err)
+[?2004l[?2004h> 
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c    
+> os.Exit(1)
+[?2004l[?2004h> }
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@d232793eb959:/app# cd /app && go build -o /app/got-patch ./cmd/got-patch
+[?2004lbash: go: command not found
+[?2004hroot@d232793eb959:/app# /app/setup.sh
+[?2004l[?2004hroot@d232793eb959:/app# set -euo pipefail
+[?2004l[?2004hroot@d232793eb959:/app# /app/test_program_with_wrapper 2>&1 | grep -c 'MALLOC INTERCEPTED' || true
+[?2004l0
+[?2004hroot@d232793eb959:/app# /app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+[?2004lbash: /app/got-patch: No such file or directory
+[0;32masciinema: recording finished[0m
+[0;32masciinema: asciicast saved to /logs/agent/recording.cast[0m
+[?2004hroot@d232793eb959:/app# chmod 0755 /app/test_program_patched
+[?2004lchmod: cannot access '/app/test_program_patched': No such file or directory
+[?2004hroot@d232793eb959:/app# /app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED'
+[?2004l0
+[?2004hroot@d232793eb959:/app# cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix (64 bytes) identical'
+[?2004lcmp: /app/test_program_patched: No such file or directory
+[?2004hroot@d232793eb959:/app# command -v go || true
+[?2004l[?2004hroot@d232793eb959:/app# cat /etc/os-release || true
+[?2004lPRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+[?2004hroot@d232793eb959:/app# apt-get update
+[?2004l0% [Working]0% [Connecting to debian.map.fastlydns.net]0% [Connecting to debian.map.fastlydns.net (151.101.74.132)]                                                            Hit:1 http://deb.debian.org/debian bookworm InRelease
+                                                            0% [Waiting for headers]0% [Waiting for headers]                        Hit:2 http://deb.debian.org/debian bookworm-updates InRelease
+                        0% [Working]0% [Waiting for headers]                        Hit:3 http://deb.debian.org/debian-security bookworm-security InRelease
+                        0% [Working]20% [Working]             Reading package lists... 0%Reading package lists... 0%Reading package lists... 0%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 99%Reading package lists... 99%Reading package lists... Done
+[?2004hroot@d232793eb959:/app# apt-get install -y golang-go
+[?2004lReading package lists... 0%Reading package lists... 0%Reading package lists... 0%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 99%Reading package lists... 99%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... Done
+Reading state information... 0% Reading state information... 0%Reading state information... Done
+The following additional packages will be installed:
+  golang-1.19-go golang-1.19-src golang-src
+Suggested packages:
+  bzr | brz
+The following NEW packages will be installed:
+  golang-1.19-go golang-1.19-src golang-go golang-src
+0 upgraded, 4 newly installed, 0 to remove and 91 not upgraded.
+Need to get 81.1 MB of archives.
+After this operation, 464 MB of additional disk space will be used.
+0% [Working]0% [Working]0% [Working]0% [Connecting to debian.map.fastlydns.net (151.101.194.132)]                                                             0% [Waiting for headers]                        Get:1 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-src all 1.19.8-2 [18.3 MB]
+0% [1 golang-1.19-src 8771 B/18.3 MB 0%]0% [1 golang-1.19-src 41.7 kB/18.3 MB 0%]0% [1 golang-1.19-src 42.9 kB/18.3 MB 0%]                                         0% [1 golang-1.19-src 177 kB/18.3 MB 1%]0% [1 golang-1.19-src 277 kB/18.3 MB 2%]0% [1 golang-1.19-src 362 kB/18.3 MB 2%]1% [1 golang-1.19-src 546 kB/18.3 MB 3%]1% [1 golang-1.19-src 776 kB/18.3 MB 4%]1% [1 golang-1.19-src 1084 kB/18.3 MB 6%]                                                                                                     175 kB/s 7min 37s1% [1 golang-1.19-src 1229 kB/18.3 MB 7%]                                                                                                     175 kB/s 7min 36s1% [1 golang-1.19-src 1288 kB/18.3 MB 7%]                                                                                                     175 kB/s 7min 36s1% [1 golang-1.19-src 1506 kB/18.3 MB 8%]                                                                                                     175 kB/s 7min 35s2% [1 golang-1.19-src 1820 kB/18.3 MB 10%]                                                                                                    175 kB/s 7min 33s2% [1 golang-1.19-src 2156 kB/18.3 MB 12%]                                                                                                    175 kB/s 7min 31s3% [1 golang-1.19-src 2746 kB/18.3 MB 15%]                                                                                                    175 kB/s 7min 28s3% [1 golang-1.19-src 3528 kB/18.3 MB 19%]                                                                                                    175 kB/s 7min 23s4% [1 golang-1.19-src 3958 kB/18.3 MB 22%]                                                                                                    175 kB/s 7min 21s5% [1 golang-1.19-src 5155 kB/18.3 MB 28%]                                                                                                    175 kB/s 7min 14s6% [1 golang-1.19-src 6094 kB/18.3 MB 33%]                                                                                                     175 kB/s 7min 9s7% [1 golang-1.19-src 7114 kB/18.3 MB 39%]                                                                                                     175 kB/s 7min 3s10% [1 golang-1.19-src 9657 kB/18.3 MB 53%]                                                                                                       1427 kB/s 50s12% [1 golang-1.19-src 11.7 MB/18.3 MB 64%]                                                                                                       1427 kB/s 48s13% [1 golang-1.19-src 12.7 MB/18.3 MB 69%]                                                                                                       1427 kB/s 47s16% [1 golang-1.19-src 15.9 MB/18.3 MB 87%]                                                                                                       1427 kB/s 45s17% [1 golang-1.19-src 16.7 MB/18.3 MB 91%]                                                                                                       1427 kB/s 45s17% [1 golang-1.19-src 17.3 MB/18.3 MB 94%]                                                                                                       1427 kB/s 44s18% [1 golang-1.19-src 18.0 MB/18.3 MB 98%]                                                                                                       1427 kB/s 44s23% [Waiting for headers]                                                                                                                         1427 kB/s 43s                                                                                                                                                               Get:2 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-go amd64 1.19.8-2 [62.7 MB]
+23% [2 golang-1.19-go 172 kB/62.7 MB 0%]                                                                                                          1427 kB/s 43s25% [2 golang-1.19-go 1783 kB/62.7 MB 3%]                                                                                                         1427 kB/s 42s25% [2 golang-1.19-go 1790 kB/62.7 MB 3%]                                                                                                         1427 kB/s 42s26% [2 golang-1.19-go 3129 kB/62.7 MB 5%]                                                                                                         1427 kB/s 41s26% [2 golang-1.19-go 3342 kB/62.7 MB 5%]                                                                                                         1427 kB/s 41s29% [2 golang-1.19-go 6199 kB/62.7 MB 10%]                                                                                                        2367 kB/s 23s32% [2 golang-1.19-go 9546 kB/62.7 MB 15%]                                                                                                        2367 kB/s 22s34% [2 golang-1.19-go 10.9 MB/62.7 MB 17%]                                                                                                        2367 kB/s 21s34% [2 golang-1.19-go 11.3 MB/62.7 MB 18%]                                                                                                        2367 kB/s 21s36% [2 golang-1.19-go 13.0 MB/62.7 MB 21%]                                                                                                        2367 kB/s 21s38% [2 golang-1.19-go 15.4 MB/62.7 MB 25%]                                                                                                        2367 kB/s 20s41% [2 golang-1.19-go 18.0 MB/62.7 MB 29%]                                                                                                        2367 kB/s 18s41% [2 golang-1.19-go 18.0 MB/62.7 MB 29%]                                                                                                        2367 kB/s 18s42% [2 golang-1.19-go 18.8 MB/62.7 MB 30%]                                                                                                        2367 kB/s 18s45% [2 golang-1.19-go 22.2 MB/62.7 MB 35%]                                                                                                        2367 kB/s 17s46% [2 golang-1.19-go 23.1 MB/62.7 MB 37%]                                                                                                        2367 kB/s 16s47% [2 golang-1.19-go 24.5 MB/62.7 MB 39%]                                                                                                        2367 kB/s 16s50% [2 golang-1.19-go 27.2 MB/62.7 MB 43%]                                                                                                        3494 kB/s 10s51% [2 golang-1.19-go 28.1 MB/62.7 MB 45%]                                                                                                         3494 kB/s 9s52% [2 golang-1.19-go 29.4 MB/62.7 MB 47%]                                                                                                         3494 kB/s 9s53% [2 golang-1.19-go 30.8 MB/62.7 MB 49%]                                                                                                         3494 kB/s 9s56% [2 golang-1.19-go 33.2 MB/62.7 MB 53%]                                                                                                         3494 kB/s 8s57% [2 golang-1.19-go 34.6 MB/62.7 MB 55%]                                                                                                         3494 kB/s 8s60% [2 golang-1.19-go 36.9 MB/62.7 MB 59%]                                                                                                         3494 kB/s 7s61% [2 golang-1.19-go 38.4 MB/62.7 MB 61%]                                                                                                         3494 kB/s 6s62% [2 golang-1.19-go 39.2 MB/62.7 MB 63%]                                                                                                         3494 kB/s 6s63% [2 golang-1.19-go 40.2 MB/62.7 MB 64%]                                                                                                         3494 kB/s 6s63% [2 golang-1.19-go 40.7 MB/62.7 MB 65%]                                                                                                         3494 kB/s 6s64% [2 golang-1.19-go 41.1 MB/62.7 MB 66%]                                                                                                         3494 kB/s 6s64% [2 golang-1.19-go 41.9 MB/62.7 MB 67%]                                                                                                         2310 kB/s 9s66% [2 golang-1.19-go 43.3 MB/62.7 MB 69%]                                                                                                         2310 kB/s 8s67% [2 golang-1.19-go 44.6 MB/62.7 MB 71%]                                                                                                         2310 kB/s 7s67% [2 golang-1.19-go 45.0 MB/62.7 MB 72%]                                                                                                         2310 kB/s 7s68% [2 golang-1.19-go 45.8 MB/62.7 MB 73%]                                                                                                         2310 kB/s 7s69% [2 golang-1.19-go 46.6 MB/62.7 MB 74%]                                                                                                         2310 kB/s 7s70% [2 golang-1.19-go 47.4 MB/62.7 MB 76%]                                                                                                         2310 kB/s 6s72% [2 golang-1.19-go 49.6 MB/62.7 MB 79%]                                                                                                         2310 kB/s 5s73% [2 golang-1.19-go 51.1 MB/62.7 MB 81%]                                                                                                         2310 kB/s 5s77% [2 golang-1.19-go 54.4 MB/62.7 MB 87%]                                                                                                         2310 kB/s 3s77% [2 golang-1.19-go 55.2 MB/62.7 MB 88%]                                                                                                         2310 kB/s 3s78% [2 golang-1.19-go 55.4 MB/62.7 MB 88%]                                                                                                         2310 kB/s 3s79% [2 golang-1.19-go 56.7 MB/62.7 MB 90%]                                                                                                         2384 kB/s 2s79% [2 golang-1.19-go 57.2 MB/62.7 MB 91%]                                                                                                         2384 kB/s 2s80% [2 golang-1.19-go 57.8 MB/62.7 MB 92%]                                                                                                         2384 kB/s 2s81% [2 golang-1.19-go 58.6 MB/62.7 MB 94%]                                                                                                         2384 kB/s 1s82% [2 golang-1.19-go 59.6 MB/62.7 MB 95%]                                                                                                         2384 kB/s 1s83% [2 golang-1.19-go 61.0 MB/62.7 MB 97%]                                                                                                         2384 kB/s 0s90% [Waiting for headers]                                                                                                                          2384 kB/s 0s                                                                                                                                                               Get:3 http://deb.debian.org/debian bookworm/main amd64 golang-src all 2:1.19~1 [5756 B]
+                                                                                                                                                               Get:4 http://deb.debian.org/debian bookworm/main amd64 golang-go amd64 2:1.19~1 [45.0 kB]
+100% [Working]                                                                                                                                     2384 kB/s 0s                                                                                                                                                               Fetched 81.1 MB in 40s (2029 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package golang-1.19-src.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 15751 files and directories currently installed.)
+Preparing to unpack .../golang-1.19-src_1.19.8-2_all.deb ...
+Unpacking golang-1.19-src (1.19.8-2) ...
+go version
+cd /app && go build -o /app/got-patch ./cmd/got-patch
+ls -la /app/got-patch
+/app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+ls -la /app/test_program_patched
+cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix (64 bytes) identical'
+/app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED'
+ps aux | egrep 'apt|dpkg' | grep -v egrep || true
+dpkg --configure -a
+apt-get install -y golang-go
+command -v go && go version
+cd /app && go build -o /app/got-patch ./cmd/got-patch
+ls -la /app/got-patch
+/app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+stat -c '%a %n' /app/test_program_patched
+cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix (64 bytes) identical'
+/app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED'
+Selecting previously unselected package golang-1.19-go.
+Preparing to unpack .../golang-1.19-go_1.19.8-2_amd64.deb ...
+Unpacking golang-1.19-go (1.19.8-2) ...
+echo OK && pwd
+ps aux | egrep 'apt|dpkg' | grep -v egrep || true
+dpkg --configure -a
+apt-get install -y golang-go
+Selecting previously unselected package golang-src.
+Preparing to unpack .../golang-src_2%3a1.19~1_all.deb ...
+Unpacking golang-src (2:1.19~1) ...
+Selecting previously unselected package golang-go:amd64.
+Preparing to unpack .../golang-go_2%3a1.19~1_amd64.deb ...
+Unpacking golang-go:amd64 (2:1.19~1) ...
+Setting up golang-1.19-src (1.19.8-2) ...
+Setting up golang-src (2:1.19~1) ...
+Setting up golang-1.19-go (1.19.8-2) ...
+Setting up golang-go:amd64 (2:1.19~1) ...
+W: Operation was interrupted before it could finish
+[?2004hroot@d232793eb959:/app# command -v go && go version
+[?2004l/usr/bin/go
+go version go1.19.8 linux/amd64
+[?2004hroot@d232793eb959:/app# cd /app && go build -o /app/got-patch ./cmd/got-patch
+[?2004l[?2004hroot@d232793eb959:/app# /app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+[?2004ldynsym: malloc idx=7, logged_malloc idx=5
+patch relocation: section=.rela.plt index=2 r_offset=0x4010 type=7 sym=7(malloc)->5(logged_malloc)
+patched 1 relocation(s) targeting malloc -> logged_malloc
+[?2004hroot@d232793eb959:/app# cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix (64 bytes) identical'
+[?2004lELF header prefix (64 bytes) identical
+[?2004hroot@d232793eb959:/app# /app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED'
+[?2004l120
+[?2004hroot@d232793eb959:/app# stat -c '%a %n' /app/test_program_with_wrapper /app/test_program_patched
+[?2004l755 /app/test_program_with_wrapper
+755 /app/test_program_patched
+[?2004hroot@d232793eb959:/app# /app/test_program_with_wrapper 2>&1 | grep -c 'MALLOC INTERCEPTED' || true
+[?2004l0
+[?2004hroot@d232793eb959:/app# chmod 0755 /app/test_program_patched
+[?2004l[?2004hroot@d232793eb959:/app# stat -c '%a %n' /app/test_program_patched
+[?2004l755 /app/test_program_patched
+[?2004hroot@d232793eb959:/app# 

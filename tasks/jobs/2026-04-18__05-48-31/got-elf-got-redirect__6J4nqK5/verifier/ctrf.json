@@ -1,0 +1,101 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 9,
+            "passed": 9,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1776510226.614098,
+            "stop": 1776510236.6807537
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_setup_builds_harness_binaries",
+                "status": "passed",
+                "duration": 0.11915322800632566,
+                "start": 1776510226.7093325,
+                "stop": 1776510226.8287356,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_got_patch_binary_builds",
+                "status": "passed",
+                "duration": 7.6380431260040496,
+                "start": 1776510226.8289769,
+                "stop": 1776510234.4672096,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_source_elf_parsing_is_manual_no_disallowed_helpers",
+                "status": "passed",
+                "duration": 0.7824011620105011,
+                "start": 1776510234.46738,
+                "stop": 1776510235.2499783,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patcher_cli_requires_arguments",
+                "status": "passed",
+                "duration": 0.257565734005766,
+                "start": 1776510235.2501712,
+                "stop": 1776510235.507905,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_unpatched_binary_has_no_interception_banner",
+                "status": "passed",
+                "duration": 0.1208824170025764,
+                "start": 1776510235.5080805,
+                "stop": 1776510235.62913,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patch_then_run_shows_many_intercepts",
+                "status": "passed",
+                "duration": 0.18789845499850344,
+                "start": 1776510235.6293,
+                "stop": 1776510235.8173606,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patched_binary_permissions_and_header_unchanged",
+                "status": "passed",
+                "duration": 0.19144470502214972,
+                "start": 1776510235.8175328,
+                "stop": 1776510236.0091534,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patch_with_default_wrapper_symbol_succeeds",
+                "status": "passed",
+                "duration": 0.30279401698498987,
+                "start": 1776510236.0093083,
+                "stop": 1776510236.3122594,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_missing_wrapper_reports_error",
+                "status": "passed",
+                "duration": 0.36801992800610606,
+                "start": 1776510236.312423,
+                "stop": 1776510236.6806047,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

@@ -1,0 +1,13 @@
+Previous response had warnings:
+WARNINGS: - Command 1 should end with newline when followed by another command. Otherwise the two commands will be concatenated together on the same line.
+
+New Terminal Output:
+
+/app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED'
+go version
+cd /app && go build -o /app/got-patch ./cmd/got-patch
+/app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+stat -c '%a %n' /app/test_program_patched
+cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix(64) identical'
+/app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED'
+

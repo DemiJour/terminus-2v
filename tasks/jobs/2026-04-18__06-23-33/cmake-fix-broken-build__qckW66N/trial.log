@@ -1,0 +1,83 @@
+Trial cmake-fix-broken-build__qckW66N failed: Docker compose command failed for environment cmake-fix-broken-build. Command: docker compose -p cmake-fix-broken-build__qckw66n --project-directory /home/jour/Downloads/Terminal-2v/tasks/cmake-fix-broken-build/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__cmake-fix-broken-build Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 628B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 5.44kB done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/ubuntu:24.04
+#3 DONE 0.0s
+
+#4 [ 1/18] FROM docker.io/library/ubuntu:24.04
+#4 DONE 0.0s
+
+#5 [ 9/18] RUN cat > plugin/plugin.h <<'EOF_PLUGIN_H'
+#5 CACHED
+
+#6 [16/18] RUN cat > engine/CMakeLists.txt <<'EOF_ENGINE_CMAKE'
+#6 CACHED
+
+#7 [17/18] RUN cat > plugin/CMakeLists.txt <<'EOF_PLUGIN_CMAKE'
+#7 CACHED
+
+#8 [13/18] RUN cat > app/build_profile.h.in <<'EOF_PROFILE_IN'
+#8 CACHED
+
+#9 [14/18] RUN cat > CMakeLists.txt <<'EOF_ROOT_CMAKE'
+#9 CACHED
+
+#10 [15/18] RUN cat > core/CMakeLists.txt <<'EOF_CORE_CMAKE'
+#10 CACHED
+
+#11 [ 3/18] WORKDIR /app
+#11 CACHED
+
+#12 [ 4/18] RUN mkdir -p core engine plugin app
+#12 CACHED
+
+#13 [11/18] RUN cat > app/main.cpp <<'EOF_MAIN_CPP'
+#13 CACHED
+
+#14 [ 8/18] RUN cat > engine/engine.cpp <<'EOF_ENGINE_CPP'
+#14 CACHED
+
+#15 [ 6/18] RUN cat > core/core.cpp <<'EOF_CORE_CPP'
+#15 CACHED
+
+#16 [ 2/18] RUN apt-get update && apt-get install -y     python3 python3-pip cmake g++ make ninja-build     && rm -rf /var/lib/apt/lists/*
+#16 CACHED
+
+#17 [ 7/18] RUN cat > engine/engine.h <<'EOF_ENGINE_H'
+#17 CACHED
+
+#18 [ 5/18] RUN cat > core/core.h <<'EOF_CORE_H'
+#18 CACHED
+
+#19 [10/18] RUN cat > plugin/plugin.cpp <<'EOF_PLUGIN_CPP'
+#19 CACHED
+
+#20 [12/18] RUN cat > app/selfcheck.cpp <<'EOF_SELFCHECK_CPP'
+#20 CACHED
+
+#21 [18/18] RUN cat > app/CMakeLists.txt <<'EOF_APP_CMAKE'
+#21 CACHED
+
+#22 [internal] load .dockerignore
+#22 transferring context: 2B done
+#22 DONE 0.0s
+
+#23 exporting to image
+#23 exporting layers done
+#23 writing image sha256:d5fbffbe2891f905d8c33a24de67e3b16e8e1ecd5da985cac825f037dd07352d done
+#23 naming to docker.io/library/hb__cmake-fix-broken-build 0.0s done
+#23 DONE 0.0s
+
+#24 resolving provenance for metadata file
+#24 DONE 0.0s
+ Image hb__cmake-fix-broken-build Built 
+ Network cmake-fix-broken-build__qckw66n_default Creating 
+ Network cmake-fix-broken-build__qckw66n_default Error Error response from daemon: all predefined address pools have been fully subnetted
+failed to create network cmake-fix-broken-build__qckw66n_default: Error response from daemon: all predefined address pools have been fully subnetted
+. Stderr: None. 

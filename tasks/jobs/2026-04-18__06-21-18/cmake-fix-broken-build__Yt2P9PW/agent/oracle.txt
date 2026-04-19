@@ -1,0 +1,26 @@
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Configuring done (1.9s)
+-- Generating done (0.0s)
+-- Build files have been written to: /app/build
+[ 11%] Building CXX object core/CMakeFiles/core.dir/core.cpp.o
+[ 22%] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o
+[ 33%] Linking CXX static library libcore.a
+[ 33%] Built target core
+[ 44%] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o
+[ 44%] Built target plugin
+[ 55%] Linking CXX static library libengine.a
+[ 55%] Built target engine
+[ 66%] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o
+[ 77%] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o
+[ 88%] Linking CXX executable ../bin/myapp
+[ 88%] Built target myapp
+[100%] Linking CXX executable ../bin/selfcheck
+[100%] Built target selfcheck

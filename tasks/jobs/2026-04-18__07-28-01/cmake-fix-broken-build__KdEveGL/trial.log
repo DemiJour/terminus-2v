@@ -1,0 +1,12 @@
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Trajectory dumped to jobs/2026-04-18__07-28-01/cmake-fix-broken-build__KdEveGL/agent/trajectory.json
+Docker compose down failed: Docker compose command failed for environment cmake-fix-broken-build. Command: docker compose -p cmake-fix-broken-build__kdevegl --project-directory /home/jour/Downloads/Terminal-2v/tasks/cmake-fix-broken-build/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml -f /home/jour/Downloads/Terminal-2v/tasks/cmake-fix-broken-build/environment/docker-compose.yaml down --rmi all --volumes --remove-orphans. Return code: 1. Stdout:  Container cmake-fix-broken-build__kdevegl-main-1 Stopping 
+ Container cmake-fix-broken-build__kdevegl-main-1 Error Error while Stopping
+Error response from daemon: cannot stop container: b7025ac9bc81169a52cf7c7d4b371caecf2eb5f3e59daee1a915c44a490d855b: permission denied
+. Stderr: None. 

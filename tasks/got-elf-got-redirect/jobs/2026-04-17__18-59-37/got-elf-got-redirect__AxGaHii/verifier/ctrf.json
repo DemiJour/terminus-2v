@@ -1,0 +1,122 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 9,
+            "passed": 2,
+            "failed": 7,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1776470495.4810221,
+            "stop": 1776470500.488555
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_setup_builds_harness_binaries",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 3.9875744999881135,
+                "start": 1776470495.5412748,
+                "stop": 1776470499.5420716,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_setup_builds_harness_binaries():\n        \"\"\"Verify /app/setup.sh exists, is executable, and produces the harness ELF binaries.\"\"\"\n        setup = Path(\"/app/setup.sh\")\n        assert setup.is_file(), \"/app/setup.sh must exist\"\n        assert os.access(setup, os.X_OK), \"/app/setup.sh must be executable\"\n        proc = _run([\"bash\", str(setup)])\n>       assert proc.returncode == 0, f\"setup.sh failed:\\n{proc.stdout}\\n{proc.stderr}\"\nE       AssertionError: setup.sh failed:\nE         \nE         /usr/bin/ld: /tmp/ccnjtEPv.o:(.data.rel+0x0): undefined reference to `logged_malloc'\nE         collect2: error: ld returned 1 exit status\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccnjtEPv.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\").returncode\n\n/tests/test_outputs.py:41: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_got_patch_binary_builds",
+                "status": "passed",
+                "duration": 0.15431409500160953,
+                "start": 1776470499.5422583,
+                "stop": 1776470499.696783,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_cmd_got_patch_avoids_elf_helper_libraries",
+                "status": "passed",
+                "duration": 0.0006997270029387437,
+                "start": 1776470499.6971576,
+                "stop": 1776470499.698017,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patcher_cli_requires_arguments",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.1344522360013798,
+                "start": 1776470499.6981945,
+                "stop": 1776470499.8362796,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_patcher_cli_requires_arguments():\n        \"\"\"With too few arguments the tool exits non-zero and prints usage.\"\"\"\n>       _assert_ok(_run([\"bash\", \"/app/setup.sh\"]), \"setup.sh\")\n\n/tests/test_outputs.py:67: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nproc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/cc1wHaFt.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\")\nwhat = 'setup.sh'\n\n    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:\n        \"\"\"Assert a prerequisite command succeeded so later failures point at the real fault.\"\"\"\n>       assert proc.returncode == 0, f\"{what} failed:\\nstdout:\\n{proc.stdout}\\nstderr:\\n{proc.stderr}\"\nE       AssertionError: setup.sh failed:\nE         stdout:\nE         \nE         stderr:\nE         /usr/bin/ld: /tmp/cc1wHaFt.o:(.data.rel+0x0): undefined reference to `logged_malloc'\nE         collect2: error: ld returned 1 exit status\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/cc1wHaFt.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\").returncode\n\n/tests/test_outputs.py:25: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_unpatched_binary_has_no_interception_banner",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.08761460799723864,
+                "start": 1776470499.8365057,
+                "stop": 1776470499.9277112,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_unpatched_binary_has_no_interception_banner():\n        \"\"\"The linked harness must not print MALLOC INTERCEPTED before patching.\"\"\"\n>       _assert_ok(_run([\"bash\", \"/app/setup.sh\"]), \"setup.sh\")\n\n/tests/test_outputs.py:78: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nproc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccHjWCjr.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\")\nwhat = 'setup.sh'\n\n    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:\n        \"\"\"Assert a prerequisite command succeeded so later failures point at the real fault.\"\"\"\n>       assert proc.returncode == 0, f\"{what} failed:\\nstdout:\\n{proc.stdout}\\nstderr:\\n{proc.stderr}\"\nE       AssertionError: setup.sh failed:\nE         stdout:\nE         \nE         stderr:\nE         /usr/bin/ld: /tmp/ccHjWCjr.o:(.data.rel+0x0): undefined reference to `logged_malloc'\nE         collect2: error: ld returned 1 exit status\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccHjWCjr.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\").returncode\n\n/tests/test_outputs.py:25: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_patch_then_run_shows_many_intercepts",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.20130922400858253,
+                "start": 1776470499.9279473,
+                "stop": 1776470500.1343174,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_patch_then_run_shows_many_intercepts():\n        \"\"\"After patching, the output must include many MALLOC INTERCEPTED lines (>=100).\"\"\"\n>       _assert_ok(_run([\"bash\", \"/app/setup.sh\"]), \"setup.sh\")\n\n/tests/test_outputs.py:86: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nproc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccfDosT0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\")\nwhat = 'setup.sh'\n\n    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:\n        \"\"\"Assert a prerequisite command succeeded so later failures point at the real fault.\"\"\"\n>       assert proc.returncode == 0, f\"{what} failed:\\nstdout:\\n{proc.stdout}\\nstderr:\\n{proc.stderr}\"\nE       AssertionError: setup.sh failed:\nE         stdout:\nE         \nE         stderr:\nE         /usr/bin/ld: /tmp/ccfDosT0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\nE         collect2: error: ld returned 1 exit status\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccfDosT0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\").returncode\n\n/tests/test_outputs.py:25: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_patch_uses_default_wrapper_when_omitted",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.12888426900462946,
+                "start": 1776470500.1346326,
+                "stop": 1776470500.2683954,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_patch_uses_default_wrapper_when_omitted():\n        \"\"\"Omitting wrapper_symbol must default to logged_malloc and still intercept malloc.\"\"\"\n>       _assert_ok(_run([\"bash\", \"/app/setup.sh\"]), \"setup.sh\")\n\n/tests/test_outputs.py:107: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nproc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccharCUi.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\")\nwhat = 'setup.sh'\n\n    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:\n        \"\"\"Assert a prerequisite command succeeded so later failures point at the real fault.\"\"\"\n>       assert proc.returncode == 0, f\"{what} failed:\\nstdout:\\n{proc.stdout}\\nstderr:\\n{proc.stderr}\"\nE       AssertionError: setup.sh failed:\nE         stdout:\nE         \nE         stderr:\nE         /usr/bin/ld: /tmp/ccharCUi.o:(.data.rel+0x0): undefined reference to `logged_malloc'\nE         collect2: error: ld returned 1 exit status\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccharCUi.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\").returncode\n\n/tests/test_outputs.py:25: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_patched_binary_permissions_and_header_unchanged",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0949088080014917,
+                "start": 1776470500.2685454,
+                "stop": 1776470500.3710077,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_patched_binary_permissions_and_header_unchanged():\n        \"\"\"Output ELF must be executable; first 64 bytes of ELF header must match input.\"\"\"\n>       _assert_ok(_run([\"bash\", \"/app/setup.sh\"]), \"setup.sh\")\n\n/tests/test_outputs.py:118: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nproc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccu93CE0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\")\nwhat = 'setup.sh'\n\n    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:\n        \"\"\"Assert a prerequisite command succeeded so later failures point at the real fault.\"\"\"\n>       assert proc.returncode == 0, f\"{what} failed:\\nstdout:\\n{proc.stdout}\\nstderr:\\n{proc.stderr}\"\nE       AssertionError: setup.sh failed:\nE         stdout:\nE         \nE         stderr:\nE         /usr/bin/ld: /tmp/ccu93CE0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\nE         collect2: error: ld returned 1 exit status\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/ccu93CE0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\").returncode\n\n/tests/test_outputs.py:25: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_missing_wrapper_reports_error",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.1133734769973671,
+                "start": 1776470500.3712213,
+                "stop": 1776470500.4883049,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_missing_wrapper_reports_error():\n        \"\"\"Unknown wrapper symbol must yield a non-zero exit and an explanatory message.\"\"\"\n>       _assert_ok(_run([\"bash\", \"/app/setup.sh\"]), \"setup.sh\")\n\n/tests/test_outputs.py:131: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nproc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/cclSbKwM.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\")\nwhat = 'setup.sh'\n\n    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:\n        \"\"\"Assert a prerequisite command succeeded so later failures point at the real fault.\"\"\"\n>       assert proc.returncode == 0, f\"{what} failed:\\nstdout:\\n{proc.stdout}\\nstderr:\\n{proc.stderr}\"\nE       AssertionError: setup.sh failed:\nE         stdout:\nE         \nE         stderr:\nE         /usr/bin/ld: /tmp/cclSbKwM.o:(.data.rel+0x0): undefined reference to `logged_malloc'\nE         collect2: error: ld returned 1 exit status\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr=\"/usr/bin/ld: /tmp/cclSbKwM.o:(.data.rel+0x0): undefined reference to `logged_malloc'\\ncollect2: error: ld returned 1 exit status\\n\").returncode\n\n/tests/test_outputs.py:25: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

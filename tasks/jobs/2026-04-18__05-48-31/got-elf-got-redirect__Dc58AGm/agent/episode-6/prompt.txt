@@ -1,0 +1,23 @@
+New Terminal Output:
+
+root@221ee57522e6:/app# dpkg --configure -a
+root@221ee57522e6:/app# apt-get -f install -y
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+0 upgraded, 0 newly installed, 0 to remove and 91 not upgraded.
+root@221ee57522e6:/app# command -v go || true
+/usr/bin/go
+root@221ee57522e6:/app# export PATH=/usr/local/go/bin:$PATH
+root@221ee57522e6:/app# command -v go; go version
+/usr/local/go/bin/go
+go version go1.22.2 linux/amd64
+root@221ee57522e6:/app# gofmt -w /app/cmd/got-patch/main.go
+root@221ee57522e6:/app# cd /app && go build -o /app/got-patch ./cmd/got-patch
+ls -la /app/got-patch
+/app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+ls -la /app/test_program_patched
+cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo "ELF header prefix identical (64 bytes)"
+readelf -rW /app/test_program_patched | sed -n '1,120p'
+/app/test_program_patched 2>&1 | grep -c "MALLOC INTERCEPTED" || true
+

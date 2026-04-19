@@ -1,0 +1,236 @@
+Trial got-elf-got-redirect__Fx3FaUt failed: Docker compose command failed for environment got-elf-got-redirect. Command: docker compose -p got-elf-got-redirect__fx3faut --project-directory /home/jour/Downloads/Terminal-2v/tasks/got-elf-got-redirect/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__got-elf-got-redirect Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 399B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.1s
+
+#5 [1/5] FROM docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 1.59kB 0.1s done
+#6 DONE 0.2s
+
+#7 [3/5] WORKDIR /app
+#7 CACHED
+
+#8 [4/5] COPY app/ /app/
+#8 CACHED
+
+#9 [2/5] RUN apt-get update   && apt-get install -y --no-install-recommends gcc libc6-dev   && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [5/5] RUN chmod +x /app/setup.sh
+#10 CACHED
+
+#11 exporting to image
+#11 exporting layers done
+#11 writing image sha256:796460973c2d8009412ed479f6b58538e40c2d4589f33ca269676b68d6badea8 done
+#11 naming to docker.io/library/hb__got-elf-got-redirect done
+#11 DONE 0.0s
+
+#12 resolving provenance for metadata file
+#12 DONE 0.0s
+ Image hb__got-elf-got-redirect Built 
+ Network got-elf-got-redirect__fx3faut_default Creating 
+ Network got-elf-got-redirect__fx3faut_default Error Error response from daemon: all predefined address pools have been fully subnetted
+failed to create network got-elf-got-redirect__fx3faut_default: Error response from daemon: all predefined address pools have been fully subnetted
+. Stderr: None. 
+Not retrying trial because the maximum number of retries has been reached
+Trial got-elf-got-redirect__H97sHHJ failed: Docker compose command failed for environment got-elf-got-redirect. Command: docker compose -p got-elf-got-redirect__h97shhj --project-directory /home/jour/Downloads/Terminal-2v/tasks/got-elf-got-redirect/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__got-elf-got-redirect Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 399B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 1.59kB done
+#6 DONE 0.0s
+
+#7 [2/5] RUN apt-get update   && apt-get install -y --no-install-recommends gcc libc6-dev   && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [3/5] WORKDIR /app
+#8 CACHED
+
+#9 [4/5] COPY app/ /app/
+#9 CACHED
+
+#10 [5/5] RUN chmod +x /app/setup.sh
+#10 CACHED
+
+#11 exporting to image
+#11 exporting layers done
+#11 writing image sha256:03f08b96e366096a37ca125a99339909ad74b0df23d34b8ce97058774408050b done
+#11 naming to docker.io/library/hb__got-elf-got-redirect done
+#11 DONE 0.0s
+
+#12 resolving provenance for metadata file
+#12 DONE 0.0s
+ Image hb__got-elf-got-redirect Built 
+ Network got-elf-got-redirect__h97shhj_default Creating 
+ Network got-elf-got-redirect__h97shhj_default Error Error response from daemon: all predefined address pools have been fully subnetted
+failed to create network got-elf-got-redirect__h97shhj_default: Error response from daemon: all predefined address pools have been fully subnetted
+. Stderr: None. 
+Not retrying trial because the maximum number of retries has been reached
+Trial got-elf-got-redirect__g8bMRrr failed: Docker compose command failed for environment got-elf-got-redirect. Command: docker compose -p got-elf-got-redirect__g8bmrrr --project-directory /home/jour/Downloads/Terminal-2v/tasks/got-elf-got-redirect/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__got-elf-got-redirect Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 399B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#3 DONE 0.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B 0.0s done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 1.59kB 0.0s done
+#6 DONE 0.1s
+
+#7 [2/5] RUN apt-get update   && apt-get install -y --no-install-recommends gcc libc6-dev   && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [3/5] WORKDIR /app
+#8 CACHED
+
+#9 [4/5] COPY app/ /app/
+#9 CACHED
+
+#10 [5/5] RUN chmod +x /app/setup.sh
+#10 CACHED
+
+#11 exporting to image
+#11 exporting layers done
+#11 writing image sha256:7c0bba6e61866498c109c8f87a97f7778c8091746464b0344c79b85fabe0c8ef 0.0s done
+#11 naming to docker.io/library/hb__got-elf-got-redirect done
+#11 DONE 0.0s
+
+#12 resolving provenance for metadata file
+#12 DONE 0.0s
+ Image hb__got-elf-got-redirect Built 
+ Network got-elf-got-redirect__g8bmrrr_default Creating 
+ Network got-elf-got-redirect__g8bmrrr_default Error Error response from daemon: all predefined address pools have been fully subnetted
+failed to create network got-elf-got-redirect__g8bmrrr_default: Error response from daemon: all predefined address pools have been fully subnetted
+. Stderr: None. 
+Not retrying trial because the maximum number of retries has been reached
+Trial got-elf-got-redirect__yBGZGTC failed: Docker compose command failed for environment got-elf-got-redirect. Command: docker compose -p got-elf-got-redirect__ybgzgtc --project-directory /home/jour/Downloads/Terminal-2v/tasks/got-elf-got-redirect/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__got-elf-got-redirect Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 399B done
+#2 DONE 0.2s
+
+#3 [internal] load metadata for docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 1.59kB done
+#6 DONE 0.0s
+
+#7 [5/5] RUN chmod +x /app/setup.sh
+#7 CACHED
+
+#8 exporting to image
+#8 exporting layers done
+#8 writing image sha256:aea17e3cda3ae6621ae7c2a985c3b87d3513132801705d50d9d76968a0204a5f 0.0s done
+#8 naming to docker.io/library/hb__got-elf-got-redirect 0.0s done
+#8 DONE 0.0s
+
+#9 resolving provenance for metadata file
+#9 DONE 0.0s
+ Image hb__got-elf-got-redirect Built 
+ Network got-elf-got-redirect__ybgzgtc_default Creating 
+ Network got-elf-got-redirect__ybgzgtc_default Error Error response from daemon: all predefined address pools have been fully subnetted
+failed to create network got-elf-got-redirect__ybgzgtc_default: Error response from daemon: all predefined address pools have been fully subnetted
+. Stderr: None. 
+Not retrying trial because the maximum number of retries has been reached
+Trial got-elf-got-redirect__m54B4TT failed: Docker compose command failed for environment got-elf-got-redirect. Command: docker compose -p got-elf-got-redirect__m54b4tt --project-directory /home/jour/Downloads/Terminal-2v/tasks/got-elf-got-redirect/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__got-elf-got-redirect Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 620B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 399B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker.io/library/golang:1.22-bookworm@sha256:cac8fb1c85bf96316112f5dd2671c8da0c19d2dfce88af9551b3141499a59eaf
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 1.59kB done
+#6 DONE 0.0s
+
+#7 [3/5] WORKDIR /app
+#7 CACHED
+
+#8 [4/5] COPY app/ /app/
+#8 CACHED
+
+#9 [2/5] RUN apt-get update   && apt-get install -y --no-install-recommends gcc libc6-dev   && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [5/5] RUN chmod +x /app/setup.sh
+#10 CACHED
+
+#11 exporting to image
+#11 exporting layers done
+#11 writing image sha256:07874baea85f6286b633ed4b4e998facac6fbbed4055380bbf33943acafa3edc 0.0s done
+#11 naming to docker.io/library/hb__got-elf-got-redirect done
+#11 DONE 0.0s
+
+#12 resolving provenance for metadata file
+#12 DONE 0.0s
+ Image hb__got-elf-got-redirect Built 
+ Network got-elf-got-redirect__m54b4tt_default Creating 
+ Network got-elf-got-redirect__m54b4tt_default Error Error response from daemon: all predefined address pools have been fully subnetted
+failed to create network got-elf-got-redirect__m54b4tt_default: Error response from daemon: all predefined address pools have been fully subnetted
+. Stderr: None. 
+Not retrying trial because the maximum number of retries has been reached

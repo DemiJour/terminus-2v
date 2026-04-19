@@ -1,0 +1,7 @@
+# Harbor uses a unique compose project name per trial, which normally creates a new
+# bridge network each time. On machines with many leftover networks, Docker can hit
+# "all predefined address pools have been fully subnetted". Host networking avoids
+# allocating another per-project subnet; this task does not publish conflicting ports.
+services:
+  main:
+    network_mode: host

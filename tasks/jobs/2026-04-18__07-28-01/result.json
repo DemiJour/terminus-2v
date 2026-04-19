@@ -1,0 +1,35 @@
+{
+    "id": "1e3e8456-9f77-4c42-9c30-cbea1ccd21bb",
+    "started_at": "2026-04-18T07:28:01.696986",
+    "finished_at": "2026-04-18T07:32:33.712674",
+    "n_total_trials": 5,
+    "stats": {
+        "n_trials": 5,
+        "n_errors": 0,
+        "evals": {
+            "terminus-2__gpt-5.2__adhoc": {
+                "n_trials": 5,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.6
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "cmake-fix-broken-build__KdEveGL",
+                            "cmake-fix-broken-build__Vn5bZon",
+                            "cmake-fix-broken-build__DqayMJj"
+                        ],
+                        "0.0": [
+                            "cmake-fix-broken-build__WHuTzgV",
+                            "cmake-fix-broken-build__7gdYTWo"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

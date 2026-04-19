@@ -1,0 +1,57 @@
+New Terminal Output:
+
+/app/test_program_patched 2>&1 | grep -c "MALLOC INTERCEPTED" || true
+root@221ee57522e6:/app# ls -la /app/got-patch
+-rwxr-xr-x 1 root root 2141926 Apr 18 11:04 /app/got-patch
+root@221ee57522e6:/app# /app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+dynsym: malloc idx=7, logged_malloc idx=5
+patched relocation: section=.rela.plt idx=2 r_offset=0x4010 type=7 sym 7(malloc) -> 5(logged_malloc)
+done: wrote /app/test_program_patched (patched 1 relocations)
+root@221ee57522e6:/app# ls -la /app/test_program_patched
+-rwxr-xr-x 1 root root 16152 Apr 18 11:04 /app/test_program_patched
+root@221ee57522e6:/app# cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo "ELF header prefix identical (64 bytes)"
+ELF header prefix identical (64 bytes)
+root@221ee57522e6:/app# readelf -rW /app/test_program_patched | sed -n '1,120p'
+
+Relocation section '.rela.dyn' at offset 0x6e0 contains 9 entries:
+    Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
+0000000000003db0  0000000000000008 R_X86_64_RELATIVE                         1250
+0000000000003db8  0000000000000008 R_X86_64_RELATIVE                         1210
+0000000000004020  0000000000000008 R_X86_64_RELATIVE                         4020
+0000000000003fc0  0000000200000006 R_X86_64_GLOB_DAT      0000000000000000 __libc_start_main@GLIBC_2.34 + 0
+0000000000003fc8  0000000300000006 R_X86_64_GLOB_DAT      0000000000000000 _ITM_deregisterTMCloneTable + 0
+0000000000003fd0  0000000600000006 R_X86_64_GLOB_DAT      0000000000000000 __gmon_start__ + 0
+0000000000003fd8  0000000800000006 R_X86_64_GLOB_DAT      0000000000000000 _ITM_registerTMCloneTable + 0
+0000000000003fe0  0000000c00000006 R_X86_64_GLOB_DAT      0000000000000000 __cxa_finalize@GLIBC_2.2.5 + 0
+0000000000004028  0000000500000001 R_X86_64_64            0000000000000000 logged_malloc + 0
+
+Relocation section '.rela.plt' at offset 0x7b8 contains 3 entries:
+    Offset             Info             Type               Symbol's Value  Symbol's Name + Addend
+0000000000004000  0000000100000007 R_X86_64_JUMP_SLOT     0000000000000000 free@GLIBC_2.2.5 + 0
+0000000000004008  0000000400000007 R_X86_64_JUMP_SLOT     0000000000000000 printf@GLIBC_2.2.5 + 0
+0000000000004010  0000000500000007 R_X86_64_JUMP_SLOT     0000000000000000 logged_malloc + 0
+root@221ee57522e6:/app# /app/test_program_patched 2>&1 | grep -c "MALLOC INTERCEPTED" || true
+120
+root@221ee57522e6:/app# export PATH=/usr/local/go/bin:$PATH
+root@221ee57522e6:/app# ls -la /app/got-patch || true
+-rwxr-xr-x 1 root root 2141926 Apr 18 11:04 /app/got-patch
+root@221ee57522e6:/app# /app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+dynsym: malloc idx=7, logged_malloc idx=5
+patched relocation: section=.rela.plt idx=2 r_offset=0x4010 type=7 sym 7(malloc) -> 5(logged_malloc)
+done: wrote /app/test_program_patched (patched 1 relocations)
+root@221ee57522e6:/app# ls -la /app/test_program_patched
+-rwxr-xr-x 1 root root 16152 Apr 18 11:05 /app/test_program_patched
+root@221ee57522e6:/app# stat -c '%a %n' /app/test_program_patched
+755 /app/test_program_patched
+root@221ee57522e6:/app# cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo "ELF header prefix identical (64 bytes)"
+ELF header prefix identical (64 bytes)
+root@221ee57522e6:/app# readelf -rW /app/test_program_patched | egrep "JUMP_SLOT|malloc|logged_malloc" || true
+0000000000004028  0000000500000001 R_X86_64_64            0000000000000000 logged_malloc + 0
+0000000000004000  0000000100000007 R_X86_64_JUMP_SLOT     0000000000000000 free@GLIBC_2.2.5 + 0
+0000000000004008  0000000400000007 R_X86_64_JUMP_SLOT     0000000000000000 printf@GLIBC_2.2.5 + 0
+0000000000004010  0000000500000007 R_X86_64_JUMP_SLOT     0000000000000000 logged_malloc + 0
+root@221ee57522e6:/app# /app/test_program_with_wrapper 2>&1 | grep -c "MALLOC INTERCEPTED" || true
+0
+root@221ee57522e6:/app# /app/test_program_patched 2>&1 | grep -c "MALLOC INTERCEPTED" || true
+120
+root@221ee57522e6:/app#

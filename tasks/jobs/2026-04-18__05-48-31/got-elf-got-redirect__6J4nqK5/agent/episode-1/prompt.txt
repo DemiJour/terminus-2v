@@ -1,0 +1,310 @@
+New Terminal Output:
+root@d232793eb959:/app# ls -la
+total 36
+drwxr-xr-x 1 root root 4096 Apr 18 00:45 .
+drwxr-xr-x 1 root root 4096 Apr 18 10:48 ..
+drwxrwxr-x 3 root root 4096 Apr 17 07:33 cmd
+-rw-rw-r-- 1 root root   25 Apr 18 00:09 go.mod
+drwxrwxr-x 3 root root 4096 Apr 17 07:34 internal
+-rw-rw-r-- 1 root root  480 Apr 18 00:09 malloc_wrapper.c
+-rwxrwxr-x 1 root root 1014 Apr 18 00:45 setup.sh
+-rw-rw-r-- 1 root root  793 Apr 18 00:09 test_program.c
+root@d232793eb959:/app# cat /app/go.mod
+module gotpatch
+
+go 1.22
+root@d232793eb959:/app# find /app -maxdepth 3 -type d -print
+/app
+/app/cmd
+/app/cmd/got-patch
+/app/internal
+/app/internal/chaff
+root@d232793eb959:/app# find /app/cmd -maxdepth 3 -type f -print
+/app/cmd/got-patch/main.go
+root@d232793eb959:/app# sed -n '1,200p' /app/cmd/got-patch/main.go
+package main
+
+import (
+        "fmt"
+        "os"
+
+        _ "gotpatch/internal/chaff"
+)
+
+func main() {
+        if len(os.Args) < 3 {
+                fmt.Fprintf(os.Stderr, "usage: %s <input_elf> <output_elf> [wrapper_symbol]\n", os.Args[0])
+                os.Exit(2)
+        }
+        fmt.Fprintf(os.Stderr, "got-patch: not implemented — replace this file with a working ELF64 LE patcher.\n")
+        os.Exit(1)
+}
+root@d232793eb959:/app# mkdir -p /app/cmd/got-patch
+root@d232793eb959:/app# cat > /app/cmd/got-patch/main.go <<'EOF'
+> package main
+>
+> import (
+> "bytes"
+> "encoding/binary"
+> "errors"
+> "fmt"
+> "io"
+> "os"
+> "path/filepath"
+> )
+>
+> // Minimal 64-bit little-endian ELF layout code (no debug/elf).
+>
+> const (
+> EI_NIDENT = 16
+>
+> ELFCLASS64 = 2
+> ELFDATA2LSB = 1
+>
+> SHT_NULL     = 0
+> SHT_SYMTAB   = 2
+> SHT_STRTAB   = 3
+> SHT_RELA     = 4
+> SHT_DYNSYM   = 11
+>
+> SHN_UNDEF = 0
+> )
+>
+> type elf64Ehdr struct {
+> Ident     [EI_NIDENT]byte
+> Type      uint16
+> Machine   uint16
+> Version   uint32
+> Entry     uint64
+> Phoff     uint64
+> Shoff     uint64
+> Flags     uint32
+> Ehsize    uint16
+> Phentsize uint16
+> Phnum     uint16
+> Shentsize uint16
+> Shnum     uint16
+> Shstrndx  uint16
+> }
+>
+> type elf64Shdr struct {
+> Name      uint32
+> Type      uint32
+> Flags     uint64
+> Addr      uint64
+> Off       uint64
+> Size      uint64
+> Link      uint32
+> Info      uint32
+> Addralign uint64
+> Entsize   uint64
+> }
+>
+> type elf64Sym struct {
+> Name  uint32
+> Info  byte
+> Other byte
+> Shndx uint16
+> Value uint64
+> Size  uint64
+> }
+>
+> type elf64Rela struct {
+> Off    uint64
+> Info   uint64
+> Addend int64
+> }
+>
+> func relaSym(info uint64) uint32  { return uint32(info >> 32) }
+> func relaType(info uint64) uint32 { return uint32(info & 0xffffffff) }
+> func makeRelaInfo(sym uint32, typ uint32) uint64 {
+> return (uint64(sym) << 32) | uint64(typ)
+> }
+>
+> func readAtFull(f *os.File, off int64, size int) ([]byte, error) {
+> b := make([]byte, size)
+> if _, err := f.ReadAt(b, off); err != nil {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return nil, err
+> }
+> return b, nil
+> }
+>
+> func readStructAt[T any](f *os.File, off int64, out *T) error {
+> var sz int
+> sz = binary.Size(*out)
+> b, err := readAtFull(f, off, sz)
+> if err != nil {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return err
+> }
+> return binary.Read(bytes.NewReader(b), binary.LittleEndian, out)
+> }
+>
+> func readCString(tab []byte, off uint32) string {
+> if int(off) >= len(tab) {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return ""
+> }
+> p := tab[off:]
+> if i := bytes.IndexByte(p, 0); i >= 0 {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return string(p[:i])
+> }
+> return string(p)
+> }
+>
+> type section struct {
+> hdr  elf64Shdr
+> name string
+> idx  int
+> }
+>
+> type dynsym struct {
+> idx  int
+> sym  elf64Sym
+> name string
+> }
+>
+> func loadSections(f *os.File, eh elf64Ehdr) ([]section, []byte, error) {
+> if eh.Shentsize == 0 || eh.Shnum == 0 {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return nil, nil, errors.New("no section headers")
+> }
+> if eh.Shentsize != uint16(binary.Size(elf64Shdr{})) {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return nil, nil, fmt.Errorf("unexpected section header size: %d", eh.Shentsize)
+> }
+> shdrs := make([]elf64Shdr, int(eh.Shnum))
+> for i := 0; i < int(eh.Shnum); i++ {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> if err := readStructAt(f, int64(eh.Shoff)+int64(i)*int64(eh.Shentsize), &shdrs[i]); err != nil {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return nil, nil, fmt.Errorf("read shdr[%d]: %w", i, err)
+>
+cmd/              go.
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+nary.LittleEndian, &r); err != nil {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return err
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> }
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> if _, err := outF.WriteAt(buf.Bytes(), off); err != nil {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return fmt.Errorf("write rela %s[%d]: %w", sec.name, i, err)
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> }
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> patched++
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> }
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> }
+> }
+>
+> if patched == 0 {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> return fmt.Errorf("no applicable RELA relocations referenced symbol malloc (idx=%d); nothing patched", mallocIdx)
+> }
+> fmt.Fprintf(os.Stderr, "patched %d relocation(s) targeting malloc -> %s\n", patched, wrapper)
+> return nil
+> }
+>
+> func usage() {
+> fmt.Fprintf(os.Stderr, "usage: got-patch <input_elf> <output_elf> [wrapper_symbol]\n")
+> }
+>
+> func main() {
+> if len(os.Args) != 3 && len(os.Args) != 4 {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> usage()
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> os.Exit(2)
+> }
+> inPath := os.Args[1]
+> outPath := os.Args[2]
+> wrapper := "logged_malloc"
+> if len(os.Args) == 4 {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> wrapper = os.Args[3]
+> }
+> if err := patchRelocations(inPath, outPath, wrapper); err != nil {
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> fmt.Fprintf(os.Stderr, "error: %v\n", err)
+>
+cmd/              go.mod            internal/         malloc_wrapper.c  setup.sh          test_program.c
+> os.Exit(1)
+> }
+> }
+> EOF
+root@d232793eb959:/app# cd /app && go build -o /app/got-patch ./cmd/got-patch
+bash: go: command not found
+root@d232793eb959:/app# /app/setup.sh
+root@d232793eb959:/app# set -euo pipefail
+root@d232793eb959:/app# /app/test_program_with_wrapper 2>&1 | grep -c 'MALLOC INTERCEPTED' || true
+0
+root@d232793eb959:/app# /app/got-patch /app/test_program_with_wrapper /app/test_program_patched
+bash: /app/got-patch: No such file or directory
+asciinema: recording finished
+asciinema: asciicast saved to /logs/agent/recording.cast
+root@d232793eb959:/app# chmod 0755 /app/test_program_patched
+chmod: cannot access '/app/test_program_patched': No such file or directory
+root@d232793eb959:/app# /app/test_program_patched 2>&1 | grep -c 'MALLOC INTERCEPTED'
+0
+root@d232793eb959:/app# cmp -n 64 /app/test_program_with_wrapper /app/test_program_patched && echo 'ELF header prefix (64 bytes) identical'
+cmp: /app/test_program_patched: No such file or directory
+root@d232793eb959:/app#

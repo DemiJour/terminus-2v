@@ -1,0 +1,104 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 9,
+            "passed": 8,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1776510235.8986063,
+            "stop": 1776510243.3545442
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_setup_builds_harness_binaries",
+                "status": "passed",
+                "duration": 0.11292805898119695,
+                "start": 1776510235.9712796,
+                "stop": 1776510236.084478,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_got_patch_binary_builds",
+                "status": "passed",
+                "duration": 6.2220297410094645,
+                "start": 1776510236.0846891,
+                "stop": 1776510242.3069205,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_source_elf_parsing_is_manual_no_disallowed_helpers",
+                "status": "passed",
+                "duration": 0.027036292987759225,
+                "start": 1776510242.3071215,
+                "stop": 1776510242.334331,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patcher_cli_requires_arguments",
+                "status": "passed",
+                "duration": 0.17683980200672522,
+                "start": 1776510242.3345013,
+                "stop": 1776510242.5115366,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_unpatched_binary_has_no_interception_banner",
+                "status": "passed",
+                "duration": 0.12649338200571947,
+                "start": 1776510242.5117323,
+                "stop": 1776510242.6384225,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patch_then_run_shows_many_intercepts",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.17830205302743707,
+                "start": 1776510242.639095,
+                "stop": 1776510242.8290455,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_patch_then_run_shows_many_intercepts():\n        \"\"\"After patching, the output must include many MALLOC INTERCEPTED lines (>=100).\"\"\"\n        _assert_setup_succeeded(_run([\"bash\", \"/app/setup.sh\"]))\n        _assert_go_build_succeeded(_run([\"go\", \"build\", \"-o\", \"/app/got-patch\", \"./cmd/got-patch\"]))\n        patch = _run(\n            [\"/app/got-patch\", \"/app/test_program_with_wrapper\", \"/app/test_program_patched\", \"logged_malloc\"]\n        )\n        assert patch.returncode == 0, f\"patch failed:\\n{patch.stdout}\\n{patch.stderr}\"\n        combined_logs = patch.stdout + patch.stderr\n        combined_lower = combined_logs.lower()\n        assert \"reloc\" in combined_lower, \"successful patch should mention relocations in output\"\n        mentions_symbols = (\n            \"symbol\" in combined_lower\n            or \"dynsym\" in combined_lower\n            or \"symtab\" in combined_lower\n            or re.search(r\"\\bsyms?\\b\", combined_lower) is not None\n        )\n>       assert mentions_symbols, (\n            \"successful patch should name symbols or dynamic symbol tables (e.g. dynsym, symtab)\"\n        )\nE       AssertionError: successful patch should name symbols or dynamic symbol tables (e.g. dynsym, symtab)\nE       assert False\n\n/tests/test_outputs.py:132: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_patched_binary_permissions_and_header_unchanged",
+                "status": "passed",
+                "duration": 0.16798080899752676,
+                "start": 1776510242.8291984,
+                "stop": 1776510242.9973612,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_patch_with_default_wrapper_symbol_succeeds",
+                "status": "passed",
+                "duration": 0.17761382699245587,
+                "start": 1776510242.9976394,
+                "stop": 1776510243.1754425,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_missing_wrapper_reports_error",
+                "status": "passed",
+                "duration": 0.17862071700801607,
+                "start": 1776510243.1756124,
+                "stop": 1776510243.3543978,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

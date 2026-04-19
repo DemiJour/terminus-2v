@@ -1,0 +1,44 @@
+Previous response had warnings:
+WARNINGS: - Command 1 should end with newline when followed by another command. Otherwise the two commands will be concatenated together on the same line.
+
+Current Terminal Screen:
+
+        inF, err := os.Open(inPath)
+        if err != nil {
+                fmt.Fprintf(os.Stderr, "open input: %v\n", err)
+                os.Exit(1)
+        }
+        defer inF.Close()
+
+        var eh elf64Ehdr
+        if err := readStructAt(inF, 0, binary.LittleEndian, &eh); err != nil {
+                fmt.Fprintf(os.Stderr, "read ELF header: %v\n", err)
+                os.Exit(1)
+        }
+        if eh.Ident[0] != 0x7f || eh.Ident[1] != 'E' || eh.Ident[2] != 'L' || eh.Ident[3] != 'F' {
+                fmt.Fprintf(os.Stderr, "not an ELF file\n")
+                os.Exit(1)
+        }
+        if eh.Ident[EI_CLASS] != ELFCLASS64 {
+                fmt.Fprintf(os.Stderr, "unsupported ELF class (need 64-bit)\n")
+                os.Exit(1)
+        }
+        if eh.Ident[EI_DATA] != ELFDATA2LSB {
+                fmt.Fprintf(os.Stderr, "unsupported ELF endianness (need little-endian)\n")
+                os.Exit(1)
+        }
+        if eh.Shoff == 0 || eh.Shnum == 0 {
+                fmt.Fprintf(os.Stderr, "missing section headers; cannot patch\n")
+                os.Exit(1)
+        }
+
+        // Read all section headers.
+        shdrs := make([]elf64Shdr, int(eh.Shnum))
+        for i := 0; i < int(eh.Shnum); i++ {
+                off := int64(eh.Shoff) + int64(i)*int64(eh.Shentsize)
+                if err := readStructAt(inF, off, binary.LittleEndian, &shdrs[i]); err != nil {
+                        fmt.Fprintf(os.Stderr, "read section header %d: %v\n", i, err)
+                        os.Exit(1)
+                }
+        }
+

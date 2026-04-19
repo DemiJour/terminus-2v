@@ -1,0 +1,29 @@
+{
+    "id": "d6357898-abb7-4af0-9dd4-23f0a97d140b",
+    "started_at": "2026-04-18T06:21:18.599915",
+    "finished_at": "2026-04-18T06:22:15.641709",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 1.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "cmake-fix-broken-build__Yt2P9PW"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

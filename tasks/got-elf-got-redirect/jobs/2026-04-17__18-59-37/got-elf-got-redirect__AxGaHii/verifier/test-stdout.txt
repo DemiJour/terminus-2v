@@ -1,0 +1,238 @@
+Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8792 kB]
+Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [295 kB]
+Fetched 9348 kB in 15s (608 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  libcurl3-gnutls libcurl4
+The following packages will be upgraded:
+  curl libcurl3-gnutls libcurl4
+3 upgraded, 0 newly installed, 0 to remove and 88 not upgraded.
+Need to get 1093 kB of archives.
+After this operation, 1024 B disk space will be freed.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 curl amd64 7.88.1-10+deb12u14 [316 kB]
+Get:2 http://deb.debian.org/debian bookworm/main amd64 libcurl4 amd64 7.88.1-10+deb12u14 [392 kB]
+Get:3 http://deb.debian.org/debian bookworm/main amd64 libcurl3-gnutls amd64 7.88.1-10+deb12u14 [386 kB]
+Fetched 1093 kB in 5s (217 kB/s)
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 15602 files and directories currently installed.)
+Preparing to unpack .../curl_7.88.1-10+deb12u14_amd64.deb ...
+Unpacking curl (7.88.1-10+deb12u14) over (7.88.1-10+deb12u5) ...
+Preparing to unpack .../libcurl4_7.88.1-10+deb12u14_amd64.deb ...
+Unpacking libcurl4:amd64 (7.88.1-10+deb12u14) over (7.88.1-10+deb12u5) ...
+Preparing to unpack .../libcurl3-gnutls_7.88.1-10+deb12u14_amd64.deb ...
+Unpacking libcurl3-gnutls:amd64 (7.88.1-10+deb12u14) over (7.88.1-10+deb12u5) ...
+Setting up libcurl3-gnutls:amd64 (7.88.1-10+deb12u14) ...
+Setting up libcurl4:amd64 (7.88.1-10+deb12u14) ...
+Setting up curl (7.88.1-10+deb12u14) ...
+Processing triggers for libc-bin (2.36-9+deb12u13) ...
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+============================= test session starts ==============================
+platform linux -- Python 3.13.9, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 9 items
+
+../tests/test_outputs.py F..FFFFFF                                       [100%]
+
+=================================== FAILURES ===================================
+______________________ test_setup_builds_harness_binaries ______________________
+
+    def test_setup_builds_harness_binaries():
+        """Verify /app/setup.sh exists, is executable, and produces the harness ELF binaries."""
+        setup = Path("/app/setup.sh")
+        assert setup.is_file(), "/app/setup.sh must exist"
+        assert os.access(setup, os.X_OK), "/app/setup.sh must be executable"
+        proc = _run(["bash", str(setup)])
+>       assert proc.returncode == 0, f"setup.sh failed:\n{proc.stdout}\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         
+E         /usr/bin/ld: /tmp/ccnjtEPv.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccnjtEPv.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:41: AssertionError
+_____________________ test_patcher_cli_requires_arguments ______________________
+
+    def test_patcher_cli_requires_arguments():
+        """With too few arguments the tool exits non-zero and prints usage."""
+>       _assert_ok(_run(["bash", "/app/setup.sh"]), "setup.sh")
+
+/tests/test_outputs.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/cc1wHaFt.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n")
+what = 'setup.sh'
+
+    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:
+        """Assert a prerequisite command succeeded so later failures point at the real fault."""
+>       assert proc.returncode == 0, f"{what} failed:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/ld: /tmp/cc1wHaFt.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/cc1wHaFt.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:25: AssertionError
+_______________ test_unpatched_binary_has_no_interception_banner _______________
+
+    def test_unpatched_binary_has_no_interception_banner():
+        """The linked harness must not print MALLOC INTERCEPTED before patching."""
+>       _assert_ok(_run(["bash", "/app/setup.sh"]), "setup.sh")
+
+/tests/test_outputs.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccHjWCjr.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n")
+what = 'setup.sh'
+
+    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:
+        """Assert a prerequisite command succeeded so later failures point at the real fault."""
+>       assert proc.returncode == 0, f"{what} failed:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/ld: /tmp/ccHjWCjr.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccHjWCjr.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:25: AssertionError
+__________________ test_patch_then_run_shows_many_intercepts ___________________
+
+    def test_patch_then_run_shows_many_intercepts():
+        """After patching, the output must include many MALLOC INTERCEPTED lines (>=100)."""
+>       _assert_ok(_run(["bash", "/app/setup.sh"]), "setup.sh")
+
+/tests/test_outputs.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccfDosT0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n")
+what = 'setup.sh'
+
+    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:
+        """Assert a prerequisite command succeeded so later failures point at the real fault."""
+>       assert proc.returncode == 0, f"{what} failed:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/ld: /tmp/ccfDosT0.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccfDosT0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:25: AssertionError
+_________________ test_patch_uses_default_wrapper_when_omitted _________________
+
+    def test_patch_uses_default_wrapper_when_omitted():
+        """Omitting wrapper_symbol must default to logged_malloc and still intercept malloc."""
+>       _assert_ok(_run(["bash", "/app/setup.sh"]), "setup.sh")
+
+/tests/test_outputs.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccharCUi.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n")
+what = 'setup.sh'
+
+    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:
+        """Assert a prerequisite command succeeded so later failures point at the real fault."""
+>       assert proc.returncode == 0, f"{what} failed:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/ld: /tmp/ccharCUi.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccharCUi.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:25: AssertionError
+_____________ test_patched_binary_permissions_and_header_unchanged _____________
+
+    def test_patched_binary_permissions_and_header_unchanged():
+        """Output ELF must be executable; first 64 bytes of ELF header must match input."""
+>       _assert_ok(_run(["bash", "/app/setup.sh"]), "setup.sh")
+
+/tests/test_outputs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccu93CE0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n")
+what = 'setup.sh'
+
+    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:
+        """Assert a prerequisite command succeeded so later failures point at the real fault."""
+>       assert proc.returncode == 0, f"{what} failed:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/ld: /tmp/ccu93CE0.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/ccu93CE0.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:25: AssertionError
+______________________ test_missing_wrapper_reports_error ______________________
+
+    def test_missing_wrapper_reports_error():
+        """Unknown wrapper symbol must yield a non-zero exit and an explanatory message."""
+>       _assert_ok(_run(["bash", "/app/setup.sh"]), "setup.sh")
+
+/tests/test_outputs.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+proc = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/cclSbKwM.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n")
+what = 'setup.sh'
+
+    def _assert_ok(proc: subprocess.CompletedProcess[str], what: str) -> None:
+        """Assert a prerequisite command succeeded so later failures point at the real fault."""
+>       assert proc.returncode == 0, f"{what} failed:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
+E       AssertionError: setup.sh failed:
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/ld: /tmp/cclSbKwM.o:(.data.rel+0x0): undefined reference to `logged_malloc'
+E         collect2: error: ld returned 1 exit status
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['bash', '/app/setup.sh'], returncode=1, stdout='', stderr="/usr/bin/ld: /tmp/cclSbKwM.o:(.data.rel+0x0): undefined reference to `logged_malloc'\ncollect2: error: ld returned 1 exit status\n").returncode
+
+/tests/test_outputs.py:25: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_got_patch_binary_builds
+PASSED ../tests/test_outputs.py::test_cmd_got_patch_avoids_elf_helper_libraries
+FAILED ../tests/test_outputs.py::test_setup_builds_harness_binaries - Asserti...
+FAILED ../tests/test_outputs.py::test_patcher_cli_requires_arguments - Assert...
+FAILED ../tests/test_outputs.py::test_unpatched_binary_has_no_interception_banner
+FAILED ../tests/test_outputs.py::test_patch_then_run_shows_many_intercepts - ...
+FAILED ../tests/test_outputs.py::test_patch_uses_default_wrapper_when_omitted
+FAILED ../tests/test_outputs.py::test_patched_binary_permissions_and_header_unchanged
+FAILED ../tests/test_outputs.py::test_missing_wrapper_reports_error - Asserti...
+========================= 7 failed, 2 passed in 5.01s ==========================

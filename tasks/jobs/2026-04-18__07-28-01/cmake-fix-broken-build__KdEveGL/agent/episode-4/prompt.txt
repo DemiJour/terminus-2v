@@ -1,0 +1,75 @@
+New Terminal Output:
+
+root@jour-VMware-Virtual-Platform:/app# cat > /app/app/CMakeLists.txt <<'EOF'
+> # Generate per-build-type header into the build tree
+> configure_file(
+>     ${CMAKE_CURRENT_SOURCE_DIR}/build_profile.h.in
+>     ${CMAKE_CURRENT_BINARY_DIR}/build_profile.h
+>     @ONLY
+> )
+>
+> add_executable(myapp
+>     main.cpp
+> )
+>
+> target_include_directories(myapp PRIVATE
+>     ${CMAKE_CURRENT_BINARY_DIR}
+> )
+>
+> target_link_libraries(myapp PRIVATE
+>     engine
+>     plugin
+> )
+>
+> target_sources(myapp PRIVATE
+>     $<TARGET_OBJECTS:plugin>
+> )
+>
+> target_compile_features(myapp PRIVATE cxx_std_20)
+>
+> add_executable(selfcheck
+>     selfcheck.cpp
+> )
+>
+> target_include_directories(selfcheck PRIVATE
+>     ${CMAKE_CURRENT_BINARY_DIR}
+> )
+>
+> target_link_libraries(selfcheck PRIVATE
+>     engine
+>     plugin
+> )
+>
+> target_sources(selfcheck PRIVATE
+>     $<TARGET_OBJECTS:plugin>
+> )
+>
+> target_compile_features(selfcheck PRIVATE cxx_std_20)
+> EOF
+root@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-ninja-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-ninja-debug
+root@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-ninja-debug
+[6/6] Linking CXX executable app/selfcheck
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-debug/app/myapp
+text: HELLO
+hash: 0x05e918d2
+valid: yes
+profile: Debug
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-debug/app/selfcheck
+selfcheck: ok (Debug)
+root@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-ninja-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-ninja-release
+root@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-ninja-release
+[6/6] Linking CXX executable app/selfcheck
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-release/app/myapp
+text: HELLO
+hash: 0x05e918d2
+valid: yes
+profile: Release
+root@jour-VMware-Virtual-Platform:/app# /tmp/build-ninja-release/app/selfcheck
+selfcheck: ok (Release)
+root@jour-VMware-Virtual-Platform:/app#

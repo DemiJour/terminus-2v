@@ -1,0 +1,29 @@
+{
+    "id": "966715e0-a950-4f50-978f-da91061a9831",
+    "started_at": "2026-04-18T06:18:07.770544",
+    "finished_at": "2026-04-18T06:19:18.551231",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 1.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "got-elf-got-redirect__Lerbmfc"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

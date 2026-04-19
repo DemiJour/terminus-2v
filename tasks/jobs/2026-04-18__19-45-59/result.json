@@ -1,0 +1,31 @@
+{
+    "id": "231885e4-2523-462e-92ad-7bdd96231828",
+    "started_at": "2026-04-18T19:45:59.461832",
+    "finished_at": "2026-04-18T19:46:12.425640",
+    "n_total_trials": 5,
+    "stats": {
+        "n_trials": 5,
+        "n_errors": 5,
+        "evals": {
+            "terminus-2__gpt-5.2__adhoc": {
+                "n_trials": 0,
+                "n_errors": 5,
+                "metrics": [
+                    {
+                        "mean": 0.0
+                    }
+                ],
+                "reward_stats": {},
+                "exception_stats": {
+                    "RuntimeError": [
+                        "got-elf-got-redirect__Fx3FaUt",
+                        "got-elf-got-redirect__H97sHHJ",
+                        "got-elf-got-redirect__g8bMRrr",
+                        "got-elf-got-redirect__yBGZGTC",
+                        "got-elf-got-redirect__m54B4TT"
+                    ]
+                }
+            }
+        }
+    }
+}

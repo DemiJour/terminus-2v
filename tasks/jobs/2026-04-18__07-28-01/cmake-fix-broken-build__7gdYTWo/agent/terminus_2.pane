@@ -1,0 +1,400 @@
+[?2004hroot@jour-VMware-Virtual-Platform:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@jour-VMware-Virtual-Platform:/app# clear
+[?2004l[H[J[3J[?2004hroot@jour-VMware-Virtual-Platform:/app# pwd
+[?2004l/app
+[?2004hroot@jour-VMware-Virtual-Platform:/app# ls -la
+[?2004ltotal 32
+drwxr-xr-x 1 root root 4096 Apr 18 11:25 [0m[01;34m.[0m
+drwxr-xr-x 1 root root 4096 Apr 18 12:28 [01;34m..[0m
+-rw-r--r-- 1 root root  223 Apr 18 11:25 CMakeLists.txt
+drwxr-xr-x 1 root root 4096 Apr 18 11:25 [01;34mapp[0m
+drwxr-xr-x 1 root root 4096 Apr 18 11:25 [01;34mcore[0m
+drwxr-xr-x 1 root root 4096 Apr 18 11:25 [01;34mengine[0m
+drwxr-xr-x 1 root root 4096 Apr 18 11:25 [01;34mplugin[0m
+[?2004hroot@jour-VMware-Virtual-Platform:/app# find . -maxdepth 3 -name CMakeLists.txt -print
+[?2004l./app/CMakeLists.txt
+./plugin/CMakeLists.txt
+./engine/CMakeLists.txt
+./core/CMakeLists.txt
+./CMakeLists.txt
+[?2004hroot@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' CMakeLists.txt
+[?2004lcmake_minimum_required(VERSION 3.16)
+project(CryptoEngine CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_subdirectory(app)
+add_subdirectory(core)
+add_subdirectory(engine)
+add_subdirectory(plugin)
+[?2004hroot@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' core/CMakeLists.txt
+[?2004ladd_library(core STATIC core.cpp)
+target_include_directories(core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004hroot@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' engine/CMakeLists.txt
+[?2004ladd_library(engine STATIC engine.cpp)
+target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004hroot@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' plugin/CMakeLists.txt
+[?2004ladd_library(plugin OBJECT plugin.cpp)
+target_include_directories(plugin PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004hroot@jour-VMware-Virtual-Platform:/app# sed -n '1,200p' app/CMakeLists.txt
+[?2004ladd_executable(myapp main.cpp)
+target_link_libraries(myapp PRIVATE engine)
+[?2004hroot@jour-VMware-Virtual-Platform:/app# find . -maxdepth 4 -type f \( -name '*.in' -o -name '*profile*' -o -name '*config*' \) -print
+[?2004l./app/build_profile.h.in
+[?2004hroot@jour-VMware-Virtual-Platform:/app# apply_patch<<'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: CMakeLists.txt
+[?2004l[?2004h> @@
+[?2004l[?2004h>  cmake_minimum_required(VERSION 3.16)
+[?2004l[?2004h>  project(CryptoEngine CXX)
+[?2004l[?2004h>  
+[?2004l[?2004h> -set(CMAKE_CXX_STANDARD 17)
+[?2004l[?2004h> -set(CMAKE_CXX_STANDARD_REQUIRED ON)
+[?2004l[?2004h> -
+[?2004l[?2004h> -add_subdirectory(app)
+[?2004l[?2004h>  add_subdirectory(core)
+[?2004l[?2004h>  add_subdirectory(engine)
+[?2004l[?2004h>  add_subdirectory(plugin)
+[?2004l[?2004h> +add_subdirectory(app)
+[?2004l[?2004h> +
+[?2004l[?2004h> +set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: apply_patch: command not found
+[?2004hroot@jour-VMware-Virtual-Platform:/app# apply_patch<<'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: core/CMakeLists.txt
+[?2004l[?2004h> @@
+[?2004l[?2004h>  add_library(core STATIC core.cpp)
+[?2004l[?2004h> -target_include_directories(core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> +target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> +
+[?2004l[?2004h> +target_compile_features(core PUBLIC cxx_std_17)
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: apply_patch: command not found
+[?2004hroot@jour-VMware-Virtual-Platform:/app# apply_patch<<'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: plugin/CMakeLists.txt
+[?2004l[?2004h> @@
+[?2004l[?2004h>  add_library(plugin OBJECT plugin.cpp)
+[?2004l[?2004h> -target_include_directories(plugin PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> +target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> +
+[?2004l[?2004h> +target_compile_features(plugin PUBLIC cxx_std_17)
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: apply_patch: command not found
+[?2004hroot@jour-VMware-Virtual-Platform:/app# apply_patch<<'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: engine/CMakeLists.txt
+[?2004l[?2004h> @@
+[?2004l[?2004h>  add_library(engine STATIC engine.cpp)
+[?2004l[?2004h> -target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> +find_package(Threads REQUIRED)
+[?2004l[?2004h> +
+[?2004l[?2004h> +target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> +
+[?2004l[?2004h> +target_link_libraries(engine
+[?2004l[?2004h> +  PUBLIC
+[?2004l[?2004h> +    core
+[?2004l[?2004h> +    Threads::Threads
+[?2004l[?2004h> +)
+[?2004l[?2004h> +
+[?2004l[?2004h> +# Keep plugin as an object-library-style component.
+[?2004l[?2004h> +target_sources(engine PRIVATE $<TARGET_OBJECTS:plugin>)
+[?2004l[?2004h> +
+[?2004l[?2004h> +target_compile_features(engine PUBLIC cxx_std_20)
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: apply_patch: command not found
+[?2004hroot@jour-VMware-Virtual-Platform:/app# apply_patch<<'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: app/CMakeLists.txt
+[?2004l[?2004h> @@
+[?2004l[?2004h> +set(_generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+[?2004l[?2004h> +file(MAKE_DIRECTORY "${_generated_dir}")
+[?2004l[?2004h> +
+[?2004l[?2004h> +# Single-config generators (Ninja/Makefiles): CMAKE_BUILD_TYPE is set at configure time.
+[?2004l[?2004h> +set(BUILD_PROFILE "${CMAKE_BUILD_TYPE}")
+[?2004l[?2004h> +if(BUILD_PROFILE STREQUAL "")
+[?2004l[?2004h> +  set(BUILD_PROFILE "Unknown")
+[?2004l[?2004h> +endif()
+[?2004l[?2004h> +
+[?2004l[?2004h> +configure_file(
+[?2004l[?2004h> +  "${CMAKE_CURRENT_SOURCE_DIR}/build_profile.h.in"
+[?2004l[?2004h> +  "${_generated_dir}/build_profile.h"
+[?2004l[?2004h> +  @ONLY
+[?2004l[?2004h> +)
+[?2004l[?2004h> +
+[?2004l[?2004h>  add_executable(myapp main.cpp)
+[?2004l[?2004h> -target_link_libraries(myapp PRIVATE engine)
+[?2004l[?2004h> +target_link_libraries(myapp PRIVATE engine)
+[?2004l[?2004h> +target_include_directories(myapp PRIVATE "${_generated_dir}")
+[?2004l[?2004h> +target_compile_features(myapp PRIVATE cxx_std_20)
+[?2004l[?2004h> +
+[?2004l[?2004h> +add_executable(selfcheck selfcheck.cpp)
+[?2004l[?2004h> +target_link_libraries(selfcheck PRIVATE engine)
+[?2004l[?2004h> +target_include_directories(selfcheck PRIVATE "${_generated_dir}")
+[?2004l[?2004h> +target_compile_features(selfcheck PRIVATE cxx_std_20)
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: apply_patch: command not found
+[?2004hroot@jour-VMware-Virtual-Platform:/app# rm -rf /tmp/build-debug /tmp/build-release
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+[?2004l-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-debug
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-debug
+[?2004l[0/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[0/7] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[0/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[0/7] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K[1/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K
+[31mFAILED: [0mengine/CMakeFiles/engine.dir/engine.cpp.o 
+/usr/bin/c++  -I/app/engine -g -std=gnu++17 -MD -MT engine/CMakeFiles/engine.dir/engine.cpp.o -MF engine/CMakeFiles/engine.dir/engine.cpp.o.d -o engine/CMakeFiles/engine.dir/engine.cpp.o -c /app/engine/engine.cpp
+/app/engine/engine.cpp:2:10: fatal error: core.h: No such file or directory
+    2 | #include "core.h"
+      |          ^~~~~~~~
+compilation terminated.
+[2/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K
+[31mFAILED: [0mapp/CMakeFiles/myapp.dir/main.cpp.o 
+/usr/bin/c++   -g -std=gnu++17 -MD -MT app/CMakeFiles/myapp.dir/main.cpp.o -MF app/CMakeFiles/myapp.dir/main.cpp.o.d -o app/CMakeFiles/myapp.dir/main.cpp.o -c /app/app/main.cpp
+/app/app/main.cpp:2:10: fatal error: engine.h: No such file or directory
+    2 | #include "engine.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[3/7] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[4/7] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K
+ninja: build stopped: subcommand failed.
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/myapp
+[?2004lbash: /tmp/build-debug/app/myapp: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/selfcheck
+[?2004lbash: /tmp/build-debug/app/selfcheck: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+[?2004l-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-release
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-release
+[?2004l[0/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[0/7] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[0/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[0/7] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K[1/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K
+[31mFAILED: [0mengine/CMakeFiles/engine.dir/engine.cpp.o 
+/usr/bin/c++  -I/app/engine -O3 -DNDEBUG -std=gnu++17 -MD -MT engine/CMakeFiles/engine.dir/engine.cpp.o -MF engine/CMakeFiles/engine.dir/engine.cpp.o.d -o engine/CMakeFiles/engine.dir/engine.cpp.o -c /app/engine/engine.cpp
+/app/engine/engine.cpp:2:10: fatal error: core.h: No such file or directory
+    2 | #include "core.h"
+      |          ^~~~~~~~
+compilation terminated.
+[2/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K
+[31mFAILED: [0mapp/CMakeFiles/myapp.dir/main.cpp.o 
+/usr/bin/c++   -O3 -DNDEBUG -std=gnu++17 -MD -MT app/CMakeFiles/myapp.dir/main.cpp.o -MF app/CMakeFiles/myapp.dir/main.cpp.o.d -o app/CMakeFiles/myapp.dir/main.cpp.o -c /app/app/main.cpp
+/app/app/main.cpp:2:10: fatal error: engine.h: No such file or directory
+    2 | #include "engine.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[3/7] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[4/7] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K
+ninja: build stopped: subcommand failed.
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/myapp
+[?2004lbash: /tmp/build-release/app/myapp: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/selfcheck
+[?2004lbash: /tmp/build-release/app/selfcheck: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cat > /app/CMakeLists.txt <<'EOF'
+[?2004l[?2004h> cmake_minimum_required(VERSION 3.16)
+[?2004l[?2004h> project(CryptoEngine CXX)
+[?2004l[?2004h> 
+[?2004l[?2004h> # Keep language standard settings target-scoped (no global CMAKE_CXX_STANDARD).
+[?2004l[?2004h> set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+[?2004l[?2004h> 
+[?2004l[?2004h> add_subdirectory(core)
+[?2004l[?2004h> add_subdirectory(plugin)
+[?2004l[?2004h> add_subdirectory(engine)
+[?2004l[?2004h> add_subdirectory(app)
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# cat > /app/core/CMakeLists.txt <<'EOF'
+[?2004l[?2004h> add_library(core STATIC core.cpp)
+[?2004l[?2004h> 
+[?2004l[?2004h> # Export public headers to dependents.
+[?2004l[?2004h> # NOTE: keep 'core' and 'PUBLIC' as the first two arguments.
+[?2004l[?2004h> target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> 
+[?2004l[?2004h> target_compile_features(core PUBLIC cxx_std_17)
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# cat > /app/plugin/CMakeLists.txt <<'EOF'
+[?2004l[?2004h> # Object-library-style component.
+[?2004l[?2004h> add_library(plugin OBJECT plugin.cpp)
+[?2004l[?2004h> 
+[?2004l[?2004h> target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> 
+[?2004l[?2004h> target_compile_features(plugin PUBLIC cxx_std_17)
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# cat > /app/engine/CMakeLists.txt <<'EOF'
+[?2004l[?2004h> add_library(engine STATIC engine.cpp)
+[?2004l[?2004h> 
+[?2004l[?2004h> find_package(Threads REQUIRED)
+[?2004l[?2004h> 
+[?2004l[?2004h> target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> 
+[?2004l[?2004h> target_link_libraries(engine
+[?2004l[?2004h>   PUBLIC
+[?2004l[?2004h>     core
+[?2004l[?2004h>     Threads::Threads
+[?2004l[?2004h> )
+[?2004l[?2004h> 
+[?2004l[?2004h> # Keep plugin as an object-library-style component in the final setup.
+[?2004l[?2004h> target_sources(engine PRIVATE $<TARGET_OBJECTS:plugin>)
+[?2004l[?2004h> 
+[?2004l[?2004h> target_compile_features(engine PUBLIC cxx_std_20)
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# cat > /app/app/CMakeLists.txt <<'EOF'
+[?2004l[?2004h> set(_generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+[?2004l[?2004h> file(MAKE_DIRECTORY "${_generated_dir}")
+[?2004l[?2004h> 
+[?2004l[?2004h> # Single-config generators (Ninja/Makefiles): CMAKE_BUILD_TYPE is known at configure time.
+[?2004l[?2004h> set(BUILD_PROFILE "${CMAKE_BUILD_TYPE}")
+[?2004l[?2004h> if(BUILD_PROFILE STREQUAL "")
+[?2004l[?2004h>   set(BUILD_PROFILE "Unknown")
+[?2004l[?2004h> endif()
+[?2004l[?2004h> 
+[?2004l[?2004h> configure_file(
+[?2004l[?2004h>   "${CMAKE_CURRENT_SOURCE_DIR}/build_profile.h.in"
+[?2004l[?2004h>   "${_generated_dir}/build_profile.h"
+[?2004l[?2004h>   @ONLY
+[?2004l[?2004h> )
+[?2004l[?2004h> 
+[?2004l[?2004h> add_executable(myapp main.cpp)
+[?2004l[?2004h> target_link_libraries(myapp PRIVATE engine)
+[?2004l[?2004h> target_include_directories(myapp PRIVATE "${_generated_dir}")
+[?2004l[?2004h> target_compile_features(myapp PRIVATE cxx_std_20)
+[?2004l[?2004h> 
+[?2004l[?2004h> add_executable(selfcheck selfcheck.cpp)
+[?2004l[?2004h> target_link_libraries(selfcheck PRIVATE engine)
+[?2004l[?2004h> target_include_directories(selfcheck PRIVATE "${_generated_dir}")
+[?2004l[?2004h> target_compile_features(selfcheck PRIVATE cxx_std_20)
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# rm -rf /tmp/build-debug /tmp/build-release
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+[?2004l-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-debug
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-debug
+[?2004l[0/9] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[0/9] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K[0/9] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[0/9] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[0/9] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K[1/9] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K
+[31mFAILED: [0mapp/CMakeFiles/myapp.dir/main.cpp.o 
+/usr/bin/c++  -I/tmp/build-debug/app/generated -I/app/engine -I/app/core -g -std=gnu++20 -MD -MT app/CMakeFiles/myapp.dir/main.cpp.o -MF app/CMakeFiles/myapp.dir/main.cpp.o.d -o app/CMakeFiles/myapp.dir/main.cpp.o -c /app/app/main.cpp
+/app/app/main.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[2/9] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K
+[31mFAILED: [0mapp/CMakeFiles/selfcheck.dir/selfcheck.cpp.o 
+/usr/bin/c++  -I/tmp/build-debug/app/generated -I/app/engine -I/app/core -g -std=gnu++20 -MD -MT app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -MF app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o.d -o app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -c /app/app/selfcheck.cpp
+/app/app/selfcheck.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[3/9] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[4/9] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K/tmp/build-debug/app/myapp
+[5/9] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K
+ninja: build stopped: subcommand failed.
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/myapp
+[?2004lbash: /tmp/build-debug/app/myapp: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/selfcheck
+[?2004lbash: /tmp/build-debug/app/selfcheck: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+[?2004l-- The CXX compiler identification is GNU 13.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-release
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-release
+[?2004l[0/9] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[0/9] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K[0/9] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[0/9] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[0/9] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K[1/9] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K
+[31mFAILED: [0mapp/CMakeFiles/selfcheck.dir/selfcheck.cpp.o 
+/usr/bin/c++  -I/tmp/build-release/app/generated -I/app/engine -I/app/core -O3 -DNDEBUG -std=gnu++20 -MD -MT app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -MF app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o.d -o app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o -c /app/app/selfcheck.cpp
+/app/app/selfcheck.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[2/9] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K
+[31mFAILED: [0mapp/CMakeFiles/myapp.dir/main.cpp.o 
+/usr/bin/c++  -I/tmp/build-release/app/generated -I/app/engine -I/app/core -O3 -DNDEBUG -std=gnu++20 -MD -MT app/CMakeFiles/myapp.dir/main.cpp.o -MF app/CMakeFiles/myapp.dir/main.cpp.o.d -o app/CMakeFiles/myapp.dir/main.cpp.o -c /app/app/main.cpp
+/app/app/main.cpp:3:10: fatal error: plugin.h: No such file or directory
+    3 | #include "plugin.h"
+      |          ^~~~~~~~~~
+compilation terminated.
+[3/9] Building CXX object core/CMakeFiles/core.dir/core.cpp.o[K[4/9] Building CXX object plugin/CMakeFiles/plugin.dir/plugin.cpp.o[K/tmp/build-release/app/myapp
+[5/9] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K
+ninja: build stopped: subcommand failed.
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/myapp
+[?2004lbash: /tmp/build-release/app/myapp: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/selfcheck
+[?2004lbash: /tmp/build-release/app/selfcheck: No such file or directory
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cat > /app/engine/CMakeLists.txt <<'EOF'
+[?2004l[?2004h> add_library(engine STATIC engine.cpp)
+[?2004l[?2004h> 
+[?2004l[?2004h> find_package(Threads REQUIRED)
+[?2004l[?2004h> 
+[?2004l[?2004h> target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+[?2004l[?2004h> 
+[?2004l[?2004h> target_link_libraries(engine
+[?2004l[?2004h>   PUBLIC
+[?2004l[?2004h>     core
+[?2004l[?2004h>     plugin
+[?2004l[?2004h>     Threads::Threads
+[?2004l[?2004h> )
+[?2004l[?2004h> 
+[?2004l[?2004h> # Keep plugin as an object-library-style component in the final setup.
+[?2004l[?2004h> target_sources(engine PRIVATE $<TARGET_OBJECTS:plugin>)
+[?2004l[?2004h> 
+[?2004l[?2004h> target_compile_features(engine PUBLIC cxx_std_20)
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+[?2004l-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-debug
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-debug
+[?2004l[0/7] Linking CXX static library core/libcore.a[K[0/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[0/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[0/7] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K[1/7] Linking CXX static library core/libcore.a[K/tmp/build-debug/app/myapp
+[2/7] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K[3/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[4/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[4/7] Linking CXX static library engine/libengine.a[K[5/7] Linking CXX static library engine/libengine.a[K[5/7] Linking CXX executable app/myapp[K[5/7] Linking CXX executable app/selfcheck[K[6/7] Linking CXX executable app/selfcheck[K[7/7] Linking CXX executable app/myapp[K
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/myapp
+[?2004ltext: HELLO
+hash: 0x05e918d2
+valid: yes
+profile: Debug
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-debug/app/selfcheck
+[?2004lselfcheck: ok (Debug)
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake -S /app -B /tmp/build-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+[?2004l-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/build-release
+[?2004hroot@jour-VMware-Virtual-Platform:/app# cmake --build /tmp/build-release
+[?2004l[0/7] Linking CXX static library core/libcore.a[K[0/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[0/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[0/7] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K[1/7] Linking CXX static library core/libcore.a[K[2/7] Building CXX object app/CMakeFiles/myapp.dir/main.cpp.o[K[3/7] Building CXX object app/CMakeFiles/selfcheck.dir/selfcheck.cpp.o[K/tmp/build-release/app/myapp
+[4/7] Building CXX object engine/CMakeFiles/engine.dir/engine.cpp.o[K[4/7] Linking CXX static library engine/libengine.a[K[5/7] Linking CXX static library engine/libengine.a[K[5/7] Linking CXX executable app/myapp[K[5/7] Linking CXX executable app/selfcheck[K[6/7] Linking CXX executable app/myapp[K[7/7] Linking CXX executable app/selfcheck[K
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/myapp
+[?2004ltext: HELLO
+hash: 0x05e918d2
+valid: yes
+profile: Release
+[?2004hroot@jour-VMware-Virtual-Platform:/app# /tmp/build-release/app/selfcheck
+[?2004lselfcheck: ok (Release)
+[?2004hroot@jour-VMware-Virtual-Platform:/app# 

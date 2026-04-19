@@ -1,0 +1,63 @@
+{
+  "analysis": "Top-level CMakeLists.txt wrongly sets a global C++17 standard (must be removed). Subdirectories are added in an order where app is added before its dependencies (engine/core/plugin), which can break target linking. core exports include dirs as PRIVATE (should be PUBLIC). engine has only private includes and doesn’t link to core nor Threads::Threads; also needs C++20 features. plugin is already an OBJECT library (good) but needs C++17 and likely should be consumed by engine. app only builds myapp; selfcheck executable is missing. There is a build_profile.h.in template in app/, but no CMake wiring to generate a per-build-type header and make both executables use it.",
+  "plan": "1) Fix top-level CMakeLists: remove global CMAKE_CXX_STANDARD lines; reorder add_subdirectory so libraries are defined before app; optionally enable compile_commands export for inspection. 2) Fix core: export headers via target_include_directories(core PUBLIC ...) and add target_compile_features(core PUBLIC cxx_std_17). 3) Fix plugin: keep OBJECT library; export includes PUBLIC (so consumers get headers) and add target_compile_features(plugin PUBLIC cxx_std_17). 4) Fix engine: add find_package(Threads REQUIRED); link to core and Threads::Threads; add plugin object sources to engine (object-library style); set includes appropriately; add target_compile_features(engine PUBLIC cxx_std_20). 5) Fix app: generate build_profile.h into the build tree per build type using configure_file with CMAKE_BUILD_TYPE (works for single-config Ninja/Makefiles); add include dir for generated header; add selfcheck executable; link both executables to engine; set target_compile_features(myapp/selfcheck PRIVATE cxx_std_20). 6) Run clean out-of-source builds with Ninja for Debug/Release and run both executables to verify expected output.",
+  "commands": [
+    {
+      "keystrokes": "apply_patch<<'PATCH'\n*** Begin Patch\n*** Update File: CMakeLists.txt\n@@\n cmake_minimum_required(VERSION 3.16)\n project(CryptoEngine CXX)\n \n-set(CMAKE_CXX_STANDARD 17)\n-set(CMAKE_CXX_STANDARD_REQUIRED ON)\n-\n-add_subdirectory(app)\n add_subdirectory(core)\n add_subdirectory(engine)\n add_subdirectory(plugin)\n+add_subdirectory(app)\n+\n+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n*** End Patch\nPATCH\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "apply_patch<<'PATCH'\n*** Begin Patch\n*** Update File: core/CMakeLists.txt\n@@\n add_library(core STATIC core.cpp)\n-target_include_directories(core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})\n+target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})\n+\n+target_compile_features(core PUBLIC cxx_std_17)\n*** End Patch\nPATCH\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "apply_patch<<'PATCH'\n*** Begin Patch\n*** Update File: plugin/CMakeLists.txt\n@@\n add_library(plugin OBJECT plugin.cpp)\n-target_include_directories(plugin PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})\n+target_include_directories(plugin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})\n+\n+target_compile_features(plugin PUBLIC cxx_std_17)\n*** End Patch\nPATCH\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "apply_patch<<'PATCH'\n*** Begin Patch\n*** Update File: engine/CMakeLists.txt\n@@\n add_library(engine STATIC engine.cpp)\n-target_include_directories(engine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})\n+find_package(Threads REQUIRED)\n+\n+target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})\n+\n+target_link_libraries(engine\n+  PUBLIC\n+    core\n+    Threads::Threads\n+)\n+\n+# Keep plugin as an object-library-style component.\n+target_sources(engine PRIVATE $<TARGET_OBJECTS:plugin>)\n+\n+target_compile_features(engine PUBLIC cxx_std_20)\n*** End Patch\nPATCH\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "apply_patch<<'PATCH'\n*** Begin Patch\n*** Update File: app/CMakeLists.txt\n@@\n+set(_generated_dir \"${CMAKE_CURRENT_BINARY_DIR}/generated\")\n+file(MAKE_DIRECTORY \"${_generated_dir}\")\n+\n+# Single-config generators (Ninja/Makefiles): CMAKE_BUILD_TYPE is set at configure time.\n+set(BUILD_PROFILE \"${CMAKE_BUILD_TYPE}\")\n+if(BUILD_PROFILE STREQUAL \"\")\n+  set(BUILD_PROFILE \"Unknown\")\n+endif()\n+\n+configure_file(\n+  \"${CMAKE_CURRENT_SOURCE_DIR}/build_profile.h.in\"\n+  \"${_generated_dir}/build_profile.h\"\n+  @ONLY\n+)\n+\n add_executable(myapp main.cpp)\n-target_link_libraries(myapp PRIVATE engine)\n+target_link_libraries(myapp PRIVATE engine)\n+target_include_directories(myapp PRIVATE \"${_generated_dir}\")\n+target_compile_features(myapp PRIVATE cxx_std_20)\n+\n+add_executable(selfcheck selfcheck.cpp)\n+target_link_libraries(selfcheck PRIVATE engine)\n+target_include_directories(selfcheck PRIVATE \"${_generated_dir}\")\n+target_compile_features(selfcheck PRIVATE cxx_std_20)\n*** End Patch\nPATCH\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "rm -rf /tmp/build-debug /tmp/build-release\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cmake -S /app -B /tmp/build-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "cmake --build /tmp/build-debug\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "/tmp/build-debug/app/myapp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "/tmp/build-debug/app/selfcheck\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cmake -S /app -B /tmp/build-release -G Ninja -DCMAKE_BUILD_TYPE=Release\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "cmake --build /tmp/build-release\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "/tmp/build-release/app/myapp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "/tmp/build-release/app/selfcheck\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

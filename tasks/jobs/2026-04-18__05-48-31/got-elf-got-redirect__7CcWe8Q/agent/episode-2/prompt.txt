@@ -1,0 +1,229 @@
+New Terminal Output:
+
+root@d16e242fc29d:/app# command -v go || true
+root@d16e242fc29d:/app# ls -la /usr/local/go/bin/go /usr/bin/go 2>/dev/null || true
+-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
+root@d16e242fc29d:/app# cat /etc/os-release
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+root@d16e242fc29d:/app# apt-get update
+Hit:1 http://deb.debian.org/debian bookworm InRelease
+Hit:2 http://deb.debian.org/debian bookworm-updates InRelease
+Hit:3 http://deb.debian.org/debian-security bookworm-security InRelease
+Reading package lists... Done
+root@d16e242fc29d:/app# apt-get install -y golang-go
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  golang-1.19-go golang-1.19-src golang-src
+Suggested packages:
+  bzr | brz
+The following NEW packages will be installed:
+  golang-1.19-go golang-1.19-src golang-go golang-src
+0 upgraded, 4 newly installed, 0 to remove and 91 not upgraded.
+Need to get 81.1 MB of archives.
+After this operation, 464 MB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-src all 1.19.8-2 [18.3 MB]
+Get:2 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-go amd64 1.19.8-2 [62.7 MB]
+26% [2 golang-1.19-go 3286 kB/62.7 MB 5%]command -v go && go version
+26% [2 golang-1.19-go 3286 kB/62.7 MB 5%]cat > /app/cmd/got-patch/main.go <<'EOF'
+package main
+
+import (
+        "bytes"
+        "encoding/binary"
+        "errors"
+        "flag"
+        "fmt"
+        "io"
+        "os"
+)
+
+const (
+        EI_CLASS = 4
+        EI_DATA  = 5
+
+        ELFCLASS64  = 2
+        ELFDATA2LSB = 1
+
+        SHT_STRTAB = 3
+        SHT_RELA   = 4
+        SHT_DYNSYM = 11
+)
+
+type elf64Ehdr struct {
+        Ident     [16]byte
+        Type      uint16
+        Machine   uint16
+        Version   uint32
+        Entry     uint64
+        Phoff     uint64
+        Shoff     uint64
+        Flags     uint32
+        Ehsize    uint16
+        Phentsize uint16
+        Phnum     uint16
+        Shentsize uint16
+        Shnum     uint16
+        Shstrndx  uint16
+}
+
+type elf64Shdr struct {
+        Name      uint32
+        Type      uint32
+        Flags     uint64
+        Addr      uint64
+        Off       uint64
+        Size      uint64
+        Link      uint32
+        Info      uint32
+        Addralign uint64
+        Entsize   uint64
+}
+
+type elf64Sym struct {
+        Name  uint32
+        Info  uint8
+        Other uint8
+        Shndx uint16
+        Value uint64
+        Size  uint64
+}
+
+type elf64Rela struct {
+        Off    uint64
+        Info   uint64
+        Addend int64
+}
+
+func elf64RSym(info uint64) uint32  { return uint32(info >> 32) }
+func elf64RType(info uint64) uint32 { return uint32(info & 0xffffffff) }
+func elf64RInfo(sym uint32, typ uint32) uint64 {
+        return (uint64(sym) << 32) | uint64(typ)
+}
+
+func readAtFull(r io.ReaderAt, off int64, b []byte) error {
+        n, err := r.ReadAt(b, off)
+        if err != nil && !errors.Is(err, io.EOF) {
+                return err
+        }
+        if n != len(b) {
+                return io.ErrUnexpectedEOF
+        }
+        return nil
+}
+
+func readStructAt[T any](r io.ReaderAt, off int64, order binary.ByteOrder, out *T) error {
+        sz := binary.Size(*out)
+        buf := make([]byte, sz)
+        if err := readAtFull(r, off, buf); err != nil {
+                return err
+        }
+        return binary.Read(bytes.NewReader(buf), order, out)
+}
+
+func readCStringFrom(r io.ReaderAt, base int64, size int64, off uint32) (string, error) {
+        start := int64(off)
+        if start < 0 || start >= size {
+                return "", fmt.Errorf("string offset out of range: %d (size %d)", start, size)
+        }
+        var out []byte
+        pos := start
+        for {
+                if pos >= size {
+                        return "", fmt.Errorf("unterminated string at offset %d", start)
+                }
+                chunk := make([]byte, 256)
+                remain := size - pos
+                if remain < int64(len(chunk)) {
+                        chunk = chunk[:remain]
+                }
+                if err := readAtFull(r, base+pos, chunk); err != nil {
+                        return "", err
+                }
+                if i := bytes.IndexByte(chunk, 0); i >= 0 {
+                        out = append(out, chunk[:i]...)
+                        return string(out), nil
+                }
+                out = append(out, chunk...)
+                pos += int64(len(chunk))
+        }
+}
+
+type section struct {
+        h    elf64Shdr
+        name string
+        idx  int
+}
+
+func main() {
+        flag.Usage = func() {
+                fmt.Fprintf(os.Stderr, "usage: %s <input_elf> <output_elf> [wrapper_symbol]\n", os.Args[0])
+        }
+        flag.Parse()
+        args := flag.Args()
+        if len(args) != 2 && len(args) != 3 {
+                flag.Usage()
+                os.Exit(2)
+        }
+        inPath := args[0]
+        outPath := args[1]
+        wrapper := "logged_malloc"
+        if len(args) == 3 {
+                wrapper = args[2]
+        }
+
+        inF, err := os.Open(inPath)
+        if err != nil {
+                fmt.Fprintf(os.Stderr, "open input: %v\n", err)
+                os.Exit(1)
+        }
+        defer inF.Close()
+
+        var eh elf64Ehdr
+        if err := readStructAt(inF, 0, binary.LittleEndian, &eh); err != nil {
+                fmt.Fprintf(os.Stderr, "read ELF header: %v\n", err)
+                os.Exit(1)
+        }
+        if eh.Ident[0] != 0x7f || eh.Ident[1] != 'E' || eh.Ident[2] != 'L' || eh.Ident[3] != 'F' {
+                fmt.Fprintf(os.Stderr, "not an ELF file\n")
+                os.Exit(1)
+        }
+        if eh.Ident[EI_CLASS] != ELFCLASS64 {
+                fmt.Fprintf(os.Stderr, "unsupported ELF class (need 64-bit)\n")
+                os.Exit(1)
+        }
+        if eh.Ident[EI_DATA] != ELFDATA2LSB {
+                fmt.Fprintf(os.Stderr, "unsupported ELF endianness (need little-endian)\n")
+                os.Exit(1)
+        }
+        if eh.Shoff == 0 || eh.Shnum == 0 {
+                fmt.Fprintf(os.Stderr, "missing section headers; cannot patch\n")
+                os.Exit(1)
+        }
+
+        shdrs := make([]elf64Shdr, int(eh.Shnum))
+        for i := 0; i < int(eh.Shnum); i++ {
+                off := int64(eh.Shoff) + int64(i)*int64(eh.Shentsize)
+                if err := readStructAt(inF, off, binary.LittleEndian, &shdrs[i]); err != nil {
+                        fmt.Fprintf(os.Stderr, "read section header %d: %v\n", i, err)
+                        os.Exit(1)
+                }
+        }
+        if int(eh.Shstrndx) <= 0 || int(eh.Shstrndx) >= len(shdrs) {
+                fmt.Fprintf(os.Stderr, "invalid shstrndx: %d\n", eh.Shstrndx)
+                os.Exit(1)
+        }
+Ign:2 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-go amd64 1.19.8-2
+Get:3 http://deb.debian.org/debian bookworm/main amd64 golang-src all 2:1.19~1 [5756 B]
+Get:4 http://deb.debian.org/debian bookworm/main amd64 golang-go amd64 2:1.19~1 [45.0 kB]
+Get:2 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-go amd64 1.19.8-2 [62.7 MB]
+58% [2 golang-1.19-go 25.1 MB/62.7 MB 40%]                                                                                                    227 kB/s 2min 45s

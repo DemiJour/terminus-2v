@@ -1,0 +1,82 @@
+{
+    "id": "ccd1d50c-adba-432e-ac7f-20b50317c5a4",
+    "task_name": "cmake-fix-broken-build",
+    "trial_name": "cmake-fix-broken-build__Wb8qLw2",
+    "trial_uri": "file:///home/jour/Downloads/Terminal-2v/tasks/jobs/2026-04-18__06-23-33/cmake-fix-broken-build__Wb8qLw2",
+    "task_id": {
+        "path": "cmake-fix-broken-build"
+    },
+    "source": null,
+    "task_checksum": "6e7ef8369f3e967b19663df800e5cb6200295af427d898c504adc608162e3143",
+    "config": {
+        "task": {
+            "path": "cmake-fix-broken-build",
+            "git_url": null,
+            "git_commit_id": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "cmake-fix-broken-build__Wb8qLw2",
+        "trials_dir": "jobs/2026-04-18__06-23-33",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "openai/gpt-5.2",
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {},
+            "env": {}
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "disable": false
+        },
+        "artifacts": [],
+        "job_id": "287c0e7c-c294-4c9e-8f8f-d5d8d9d558d2"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "gpt-5.2",
+            "provider": "openai"
+        }
+    },
+    "agent_result": null,
+    "verifier_result": null,
+    "exception_info": {
+        "exception_type": "RuntimeError",
+        "exception_message": "Docker compose command failed for environment cmake-fix-broken-build. Command: docker compose -p cmake-fix-broken-build__wb8qlw2 --project-directory /home/jour/Downloads/Terminal-2v/tasks/cmake-fix-broken-build/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__cmake-fix-broken-build Building \n#1 [internal] load local bake definitions\n#1 reading from stdin 628B done\n#1 DONE 0.0s\n\n#2 [internal] load build definition from Dockerfile\n#2 transferring dockerfile: 5.44kB done\n#2 DONE 0.0s\n\n#3 [internal] load metadata for docker.io/library/ubuntu:24.04\n#3 DONE 0.0s\n\n#4 [internal] load .dockerignore\n#4 transferring context: 2B done\n#4 DONE 0.0s\n\n#5 [ 1/18] FROM docker.io/library/ubuntu:24.04\n#5 DONE 0.0s\n\n#6 [12/18] RUN cat > app/selfcheck.cpp <<'EOF_SELFCHECK_CPP'\n#6 CACHED\n\n#7 [ 3/18] WORKDIR /app\n#7 CACHED\n\n#8 [13/18] RUN cat > app/build_profile.h.in <<'EOF_PROFILE_IN'\n#8 CACHED\n\n#9 [ 2/18] RUN apt-get update && apt-get install -y     python3 python3-pip cmake g++ make ninja-build     && rm -rf /var/lib/apt/lists/*\n#9 CACHED\n\n#10 [17/18] RUN cat > plugin/CMakeLists.txt <<'EOF_PLUGIN_CMAKE'\n#10 CACHED\n\n#11 [15/18] RUN cat > core/CMakeLists.txt <<'EOF_CORE_CMAKE'\n#11 CACHED\n\n#12 [ 4/18] RUN mkdir -p core engine plugin app\n#12 CACHED\n\n#13 [16/18] RUN cat > engine/CMakeLists.txt <<'EOF_ENGINE_CMAKE'\n#13 CACHED\n\n#14 [ 6/18] RUN cat > core/core.cpp <<'EOF_CORE_CPP'\n#14 CACHED\n\n#15 [ 7/18] RUN cat > engine/engine.h <<'EOF_ENGINE_H'\n#15 CACHED\n\n#16 [14/18] RUN cat > CMakeLists.txt <<'EOF_ROOT_CMAKE'\n#16 CACHED\n\n#17 [ 8/18] RUN cat > engine/engine.cpp <<'EOF_ENGINE_CPP'\n#17 CACHED\n\n#18 [10/18] RUN cat > plugin/plugin.cpp <<'EOF_PLUGIN_CPP'\n#18 CACHED\n\n#19 [ 9/18] RUN cat > plugin/plugin.h <<'EOF_PLUGIN_H'\n#19 CACHED\n\n#20 [11/18] RUN cat > app/main.cpp <<'EOF_MAIN_CPP'\n#20 CACHED\n\n#21 [ 5/18] RUN cat > core/core.h <<'EOF_CORE_H'\n#21 CACHED\n\n#22 [18/18] RUN cat > app/CMakeLists.txt <<'EOF_APP_CMAKE'\n#22 CACHED\n\n#23 exporting to image\n#23 exporting layers done\n#23 writing image sha256:68d22947c86bc223572c48462df2ffa76f8c501643cd23c30b06b5b8a4d787e2 done\n#23 naming to docker.io/library/hb__cmake-fix-broken-build done\n#23 DONE 0.0s\n\n#24 resolving provenance for metadata file\n#24 DONE 0.0s\n Image hb__cmake-fix-broken-build Built \n Network cmake-fix-broken-build__wb8qlw2_default Creating \n Network cmake-fix-broken-build__wb8qlw2_default Error Error response from daemon: all predefined address pools have been fully subnetted\nfailed to create network cmake-fix-broken-build__wb8qlw2_default: Error response from daemon: all predefined address pools have been fully subnetted\n. Stderr: None. ",
+        "exception_traceback": "Traceback (most recent call last):\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/trial/trial.py\", line 479, in run\n    await self._setup_environment()\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/trial/trial.py\", line 212, in _setup_environment\n    await self._start_environment_with_retry()\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/tenacity/asyncio/__init__.py\", line 193, in async_wrapped\n    return await copy(fn, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/tenacity/asyncio/__init__.py\", line 112, in __call__\n    do = await self.iter(retry_state=retry_state)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/tenacity/asyncio/__init__.py\", line 157, in iter\n    result = await action(retry_state)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/tenacity/_utils.py\", line 111, in inner\n    return call(*args, **kwargs)\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/tenacity/__init__.py\", line 393, in <lambda>\n    self._add_action_func(lambda rs: rs.outcome.result())\n                                     ~~~~~~~~~~~~~~~~~^^\n  File \"/home/jour/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/concurrent/futures/_base.py\", line 449, in result\n    return self.__get_result()\n           ~~~~~~~~~~~~~~~~~^^\n  File \"/home/jour/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/concurrent/futures/_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/tenacity/asyncio/__init__.py\", line 116, in __call__\n    result = await fn(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/trial/trial.py\", line 224, in _start_environment_with_retry\n    await asyncio.wait_for(\n    ...<4 lines>...\n    )\n  File \"/home/jour/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/tasks.py\", line 507, in wait_for\n    return await fut\n           ^^^^^^^^^\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker.py\", line 246, in start\n    await self._run_docker_compose_command([\"up\", \"--detach\", \"--wait\"])\n  File \"/home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker.py\", line 219, in _run_docker_compose_command\n    raise RuntimeError(\n    ...<5 lines>...\n    )\nRuntimeError: Docker compose command failed for environment cmake-fix-broken-build. Command: docker compose -p cmake-fix-broken-build__wb8qlw2 --project-directory /home/jour/Downloads/Terminal-2v/tasks/cmake-fix-broken-build/environment -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-base.yaml -f /home/jour/.local/share/uv/tools/snorkelai-stb/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml up --detach --wait. Return code: 1. Stdout:  Image hb__cmake-fix-broken-build Building \n#1 [internal] load local bake definitions\n#1 reading from stdin 628B done\n#1 DONE 0.0s\n\n#2 [internal] load build definition from Dockerfile\n#2 transferring dockerfile: 5.44kB done\n#2 DONE 0.0s\n\n#3 [internal] load metadata for docker.io/library/ubuntu:24.04\n#3 DONE 0.0s\n\n#4 [internal] load .dockerignore\n#4 transferring context: 2B done\n#4 DONE 0.0s\n\n#5 [ 1/18] FROM docker.io/library/ubuntu:24.04\n#5 DONE 0.0s\n\n#6 [12/18] RUN cat > app/selfcheck.cpp <<'EOF_SELFCHECK_CPP'\n#6 CACHED\n\n#7 [ 3/18] WORKDIR /app\n#7 CACHED\n\n#8 [13/18] RUN cat > app/build_profile.h.in <<'EOF_PROFILE_IN'\n#8 CACHED\n\n#9 [ 2/18] RUN apt-get update && apt-get install -y     python3 python3-pip cmake g++ make ninja-build     && rm -rf /var/lib/apt/lists/*\n#9 CACHED\n\n#10 [17/18] RUN cat > plugin/CMakeLists.txt <<'EOF_PLUGIN_CMAKE'\n#10 CACHED\n\n#11 [15/18] RUN cat > core/CMakeLists.txt <<'EOF_CORE_CMAKE'\n#11 CACHED\n\n#12 [ 4/18] RUN mkdir -p core engine plugin app\n#12 CACHED\n\n#13 [16/18] RUN cat > engine/CMakeLists.txt <<'EOF_ENGINE_CMAKE'\n#13 CACHED\n\n#14 [ 6/18] RUN cat > core/core.cpp <<'EOF_CORE_CPP'\n#14 CACHED\n\n#15 [ 7/18] RUN cat > engine/engine.h <<'EOF_ENGINE_H'\n#15 CACHED\n\n#16 [14/18] RUN cat > CMakeLists.txt <<'EOF_ROOT_CMAKE'\n#16 CACHED\n\n#17 [ 8/18] RUN cat > engine/engine.cpp <<'EOF_ENGINE_CPP'\n#17 CACHED\n\n#18 [10/18] RUN cat > plugin/plugin.cpp <<'EOF_PLUGIN_CPP'\n#18 CACHED\n\n#19 [ 9/18] RUN cat > plugin/plugin.h <<'EOF_PLUGIN_H'\n#19 CACHED\n\n#20 [11/18] RUN cat > app/main.cpp <<'EOF_MAIN_CPP'\n#20 CACHED\n\n#21 [ 5/18] RUN cat > core/core.h <<'EOF_CORE_H'\n#21 CACHED\n\n#22 [18/18] RUN cat > app/CMakeLists.txt <<'EOF_APP_CMAKE'\n#22 CACHED\n\n#23 exporting to image\n#23 exporting layers done\n#23 writing image sha256:68d22947c86bc223572c48462df2ffa76f8c501643cd23c30b06b5b8a4d787e2 done\n#23 naming to docker.io/library/hb__cmake-fix-broken-build done\n#23 DONE 0.0s\n\n#24 resolving provenance for metadata file\n#24 DONE 0.0s\n Image hb__cmake-fix-broken-build Built \n Network cmake-fix-broken-build__wb8qlw2_default Creating \n Network cmake-fix-broken-build__wb8qlw2_default Error Error response from daemon: all predefined address pools have been fully subnetted\nfailed to create network cmake-fix-broken-build__wb8qlw2_default: Error response from daemon: all predefined address pools have been fully subnetted\n. Stderr: None. \n",
+        "occurred_at": "2026-04-18T06:26:03.263280"
+    },
+    "started_at": "2026-04-18T11:23:33.964283Z",
+    "finished_at": "2026-04-18T11:26:03.398137Z",
+    "environment_setup": {
+        "started_at": "2026-04-18T11:23:33.964809Z",
+        "finished_at": "2026-04-18T11:26:03.262055Z"
+    },
+    "agent_setup": null,
+    "agent_execution": null,
+    "verifier": null
+}

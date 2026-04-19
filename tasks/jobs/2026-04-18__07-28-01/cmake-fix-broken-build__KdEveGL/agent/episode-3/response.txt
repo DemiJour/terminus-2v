@@ -1,0 +1,43 @@
+{
+  "analysis": "Build fails because app sources include \"plugin.h\" but the app targets don’t have plugin’s include directory on their compile line. Adding $<TARGET_OBJECTS:plugin> only contributes object files, not usage requirements like include paths. Since plugin is an OBJECT library, we should propagate its include dirs by linking to plugin as a target (allowed for OBJECT libs) or explicitly adding plugin’s include directory to app targets. Best is to link the plugin target for usage requirements and still add its objects via target_sources to keep it object-library-style.",
+  "plan": "Update app/CMakeLists.txt to link myapp and selfcheck against the plugin target (to inherit its PUBLIC include dirs), while keeping $<TARGET_OBJECTS:plugin> in target_sources to actually compile/link the object files. Then rebuild Debug/Release Ninja builds and run the executables to verify expected output.",
+  "commands": [
+    {
+      "keystrokes": "cat > /app/app/CMakeLists.txt <<'EOF'\n# Generate per-build-type header into the build tree\nconfigure_file(\n    ${CMAKE_CURRENT_SOURCE_DIR}/build_profile.h.in\n    ${CMAKE_CURRENT_BINARY_DIR}/build_profile.h\n    @ONLY\n)\n\nadd_executable(myapp\n    main.cpp\n)\n\ntarget_include_directories(myapp PRIVATE\n    ${CMAKE_CURRENT_BINARY_DIR}\n)\n\ntarget_link_libraries(myapp PRIVATE\n    engine\n    plugin\n)\n\ntarget_sources(myapp PRIVATE\n    $<TARGET_OBJECTS:plugin>\n)\n\ntarget_compile_features(myapp PRIVATE cxx_std_20)\n\nadd_executable(selfcheck\n    selfcheck.cpp\n)\n\ntarget_include_directories(selfcheck PRIVATE\n    ${CMAKE_CURRENT_BINARY_DIR}\n)\n\ntarget_link_libraries(selfcheck PRIVATE\n    engine\n    plugin\n)\n\ntarget_sources(selfcheck PRIVATE\n    $<TARGET_OBJECTS:plugin>\n)\n\ntarget_compile_features(selfcheck PRIVATE cxx_std_20)\nEOF\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "cmake -S /app -B /tmp/build-ninja-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "cmake --build /tmp/build-ninja-debug\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "/tmp/build-ninja-debug/app/myapp\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "/tmp/build-ninja-debug/app/selfcheck\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "cmake -S /app -B /tmp/build-ninja-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "cmake --build /tmp/build-ninja-release\n",
+      "duration": 5.0
+    },
+    {
+      "keystrokes": "/tmp/build-ninja-release/app/myapp\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "/tmp/build-ninja-release/app/selfcheck\n",
+      "duration": 0.5
+    }
+  ],
+  "task_complete": false
+}

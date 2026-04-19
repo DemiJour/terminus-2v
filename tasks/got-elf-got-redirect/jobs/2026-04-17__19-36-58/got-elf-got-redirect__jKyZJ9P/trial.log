@@ -1,0 +1,4 @@
+Docker compose down failed: Docker compose command failed for environment got-elf-got-redirect. Command: docker compose -p got-elf-got-redirect__jkyzj9p -f /home/jour/.local/share/uv/tools/harbor/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml down --rmi all --volumes --remove-orphans. Return code: 1. Stdout:  Container got-elf-got-redirect__jkyzj9p-main-1 Stopping 
+ Container got-elf-got-redirect__jkyzj9p-main-1 Error Error while Stopping
+Error response from daemon: cannot stop container: edde172f3cfde23ccdb87d59bd07119d28b0d6bc14de4b942ef497052becbd14: permission denied
+. Stderr: None. 
