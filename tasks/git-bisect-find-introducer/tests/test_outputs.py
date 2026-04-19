@@ -1,10 +1,71 @@
 """Verify the agent wrote the correct bisect result and report."""
 import json
 import re
+import subprocess
 from pathlib import Path
 
 # Full 40-char lowercase hex
 HASH_PATTERN = re.compile(r"^[0-9a-f]{40}\s*$")
+
+REPO = Path("/app/repo")
+SOURCE_CANDIDATES = ("src/main.go", "src/main.py")
+
+
+def _git(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    """Run git in /app/repo."""
+    return subprocess.run(
+        ["git", "-C", str(REPO), *args],
+        capture_output=True,
+        text=True,
+        check=check,
+    )
+
+
+def _file_at_commit(commit: str, rel: str) -> str | None:
+    """Return file contents at commit, or None if path missing at that commit."""
+    p = _git("show", f"{commit}:{rel}", check=False)
+    if p.returncode != 0:
+        return None
+    return p.stdout
+
+
+def _first_commit_with_exact_bug_line() -> tuple[str, str, str]:
+    """Oldest-first scan: first commit where main source has a whole line exactly BUG_INTRODUCED."""
+    rev = _git("rev-list", "--reverse", "HEAD")
+    commits = [c for c in rev.stdout.strip().splitlines() if c]
+    assert commits, "Repository has no commits (broken task image)"
+    for commit in commits:
+        for rel in SOURCE_CANDIDATES:
+            body = _file_at_commit(commit, rel)
+            if body is None:
+                continue
+            if any(line == "BUG_INTRODUCED" for line in body.splitlines()):
+                h = _git("log", "-1", "--format=%H", commit).stdout.strip().lower()
+                subj = _git("log", "-1", "--format=%s", commit).stdout.strip()
+                auth = _git("log", "-1", "--format=%ae", commit).stdout.strip()
+                assert HASH_PATTERN.match(h), f"Computed hash invalid: {h!r}"
+                return h, subj, auth
+    raise AssertionError(
+        "No commit introduces exact line BUG_INTRODUCED (broken task image)"
+    )
+
+
+def _expected_report_from_answer() -> dict[str, object]:
+    """Canonical report dict for the commit named in /app/answer.txt (matches oracle semantics)."""
+    lines = Path("/app/answer.txt").read_text().strip().splitlines()
+    assert len(lines) >= 3, "answer.txt must have three lines"
+    h = lines[0].strip().lower()
+    subj = lines[1].strip()
+    auth = lines[2].strip()
+    files_raw = _git("diff-tree", "--no-commit-id", "--name-only", "-r", h).stdout.splitlines()
+    files = sorted({f for f in files_raw if f})
+    return {
+        "hash": h,
+        "subject": subj,
+        "author": auth,
+        "files_touched": files,
+        "bug_line_is_exact": True,
+    }
 
 
 def test_answer_file_exists() -> None:
@@ -62,23 +123,14 @@ def test_answer_line2_and_line3_non_empty() -> None:
     assert lines[2].strip(), "Line 3 (author email) must be non-empty"
 
 
-def test_answer_matches_expected_commit_subject_and_author() -> None:
-    """Lines 1–3 must equal expected hash, subject, and author email."""
-    answer_path = Path("/app/answer.txt")
-    expected_hash_path = Path("/app/expected_commit.txt")
-    expected_subject_path = Path("/app/expected_subject.txt")
-    expected_author_path = Path("/app/expected_author.txt")
-    assert expected_hash_path.exists(), "Expected commit file missing (task setup)"
-    assert expected_subject_path.exists(), "Expected subject file missing (task setup)"
-    assert expected_author_path.exists(), "Expected author file missing (task setup)"
-    lines = answer_path.read_text().strip().splitlines()
+def test_answer_matches_golden_commit_subject_and_author() -> None:
+    """Lines 1–3 must match the first commit that introduced a standalone BUG_INTRODUCED line (from git)."""
+    expected_hash, expected_subject, expected_author = _first_commit_with_exact_bug_line()
+    lines = Path("/app/answer.txt").read_text().strip().splitlines()
     assert len(lines) >= 3, "Answer must have three lines"
-    answer_hash = lines[0].strip()
+    answer_hash = lines[0].strip().lower()
     answer_subject = lines[1].strip()
     answer_author = lines[2].strip()
-    expected_hash = expected_hash_path.read_text().strip()
-    expected_subject = expected_subject_path.read_text().strip()
-    expected_author = expected_author_path.read_text().strip()
     assert answer_hash == expected_hash, (
         f"Commit hash mismatch: got {answer_hash}, expected {expected_hash}"
     )
@@ -98,46 +150,44 @@ def test_answer_file_has_no_extra_trailing_newlines() -> None:
         assert not raw.endswith(b"\n\n"), "File must not end with blank lines"
 
 
-def test_expected_commit_file_format() -> None:
-    """Expected commit file must be a valid 40-char hex hash."""
-    expected_path = Path("/app/expected_commit.txt")
-    assert expected_path.exists(), "Expected commit file missing (task setup)"
-    content = expected_path.read_text().strip()
-    assert HASH_PATTERN.match(content), (
-        f"expected_commit.txt must be 40-char hex, got: {content!r}"
-    )
-
-
 def test_report_json_exists_and_is_valid_json() -> None:
-    """Valid JSON must exist at /app/report.json."""
+    """Valid JSON must exist at /app/report.json and parse as an object."""
     report_path = Path("/app/report.json")
     assert report_path.exists(), "report.json not found at /app/report.json"
     try:
-        with report_path.open() as f:
-            json.load(f)
+        data = json.loads(report_path.read_text())
     except json.JSONDecodeError as exc:
         raise AssertionError(f"report.json is not valid JSON: {exc}") from exc
+    assert isinstance(data, dict), "report.json root must be a JSON object"
 
 
 def test_report_json_schema_and_consistency() -> None:
-    """report.json must follow the documented schema and match /app/answer.txt."""
-    answer_lines = Path("/app/answer.txt").read_text().strip().splitlines()
-    assert len(answer_lines) == 3, "answer.txt must have exactly three lines"
-    answer_hash, answer_subject, answer_author = [ln.strip() for ln in answer_lines]
-
+    """report.json must follow the documented schema and match git metadata for /app/answer.txt line 1."""
+    expected = _expected_report_from_answer()
     report = json.loads(Path("/app/report.json").read_text())
 
     for key in ("hash", "subject", "author", "files_touched", "bug_line_is_exact"):
         assert key in report, f"report.json missing key: {key}"
 
-    assert report["hash"] == answer_hash, "report.hash must equal answer.txt line 1"
-    assert report["subject"] == answer_subject, "report.subject must equal answer.txt line 2"
-    assert report["author"] == answer_author, "report.author must equal answer.txt line 3"
+    assert str(report["hash"]).lower() == expected["hash"], (
+        "report.hash must equal answer.txt line 1 (case-insensitive)"
+    )
+    assert report["subject"] == expected["subject"], (
+        "report.subject must equal answer.txt line 2"
+    )
+    assert report["author"] == expected["author"], (
+        "report.author must equal answer.txt line 3"
+    )
 
     files = report["files_touched"]
     assert isinstance(files, list), "files_touched must be a list"
     assert all(isinstance(f, str) for f in files), "files_touched must be list[str]"
     assert files == sorted(set(files)), "files_touched must be sorted and unique"
-    assert "src/main.py" in files, "src/main.py must be listed in files_touched"
+    assert files == expected["files_touched"], (
+        "report.files_touched must match git diff-tree for the answer commit"
+    )
+    assert ("src/main.go" in files) or ("src/main.py" in files), (
+        "files_touched must list the traced source file (src/main.go or legacy src/main.py)"
+    )
 
     assert report["bug_line_is_exact"] is True, "bug_line_is_exact must be true"

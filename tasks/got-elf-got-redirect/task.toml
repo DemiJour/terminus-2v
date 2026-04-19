@@ -1,18 +1,25 @@
-# Task configuration schema version
 version = "2.0"
 
 [metadata]
 author_name = "Richard"
 author_email = "rickjmcwork@gmail.com"
-difficulty = "unknown"
+difficulty = "hard"
 category = "software-engineering"
 subcategories = [ "tool_specific" ]
 number_of_milestones = 0
 codebase_size = "small"
 languages = [ "go", "bash", "c" ]
-tags = [ "elf", "got", "relocation", "golang", "binary-patching" ]
+tags = [ "elf", "elf64", "got", "relocation", "golang", "binary-patching", "x86-64", "linux" ]
 expert_time_estimate_min = 90
 junior_time_estimate_min = 240
+primary_language = "Go"
+domain = "Systems & Low-level"
+tool = "ELF64 relocations / GOT"
+task_type = "Binary patching"
+# Single service in docker-compose.yaml (full project + network_mode override for `main`).
+is_multi_container = false
+# Required when `environment/docker-compose.yaml` exists (edition_2 static checks).
+custom_docker_compose = true
 
 [verifier]
 timeout_sec = 600.0
@@ -25,3 +32,10 @@ build_timeout_sec = 900.0
 cpus = 2
 memory_mb = 4096
 storage_mb = 10240
+gpus = 0
+allow_internet = true
+mcp_servers = []
+
+[verifier.env]
+
+[solution.env]

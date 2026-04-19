@@ -1,0 +1,4 @@
+status: waiting for both good and bad commits
+status: waiting for good commit(s), bad commit known
+Bisecting: 8 revisions left to test after this (roughly 3 steps)
+[0b1b8ccf71518885eabd20048e892d5d9cff8ef4] Add feature E

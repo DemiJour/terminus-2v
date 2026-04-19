@@ -1,0 +1,32 @@
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+============================= test session starts ==============================
+platform linux -- Python 3.13.9, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 11 items
+
+../tests/test_outputs.py ...........                                     [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_answer_file_exists
+PASSED ../tests/test_outputs.py::test_answer_has_exactly_three_lines
+PASSED ../tests/test_outputs.py::test_answer_line1_is_valid_commit_hash
+PASSED ../tests/test_outputs.py::test_answer_line1_has_exactly_40_characters
+PASSED ../tests/test_outputs.py::test_answer_line1_contains_only_lowercase_hex
+PASSED ../tests/test_outputs.py::test_answer_line2_and_line3_non_empty
+PASSED ../tests/test_outputs.py::test_answer_matches_expected_commit_subject_and_author
+PASSED ../tests/test_outputs.py::test_answer_file_has_no_extra_trailing_newlines
+PASSED ../tests/test_outputs.py::test_expected_commit_file_format
+PASSED ../tests/test_outputs.py::test_report_json_exists_and_is_valid_json
+PASSED ../tests/test_outputs.py::test_report_json_schema_and_consistency
+============================== 11 passed in 0.06s ==============================

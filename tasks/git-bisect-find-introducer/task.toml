@@ -3,18 +3,15 @@ version = "2.0"
 [metadata]
 author_name = "Richard"
 author_email = "rickjmcwork@gmail.com"
-difficulty = "medium"
+difficulty = "hard"
 category = "software-engineering"
 subcategories = [ "tool_specific" ]
 number_of_milestones = 0
-codebase_size = "small"
-languages = [ "bash", "python" ]
+codebase_size = "minimal"
+languages = [ "go", "bash", "python" ]
 expert_time_estimate_min = 45
 junior_time_estimate_min = 120
-tags = [ "git", "bisect", "version-control", "debugging", "git-history" ]
-# Required when environment/docker-compose.yaml is present (Harbor merges it with base compose).
-is_multi_container = true
-custom_docker_compose = true
+tags = [ "git", "bisect", "golang", "version-control", "debugging", "git-history" ]
 
 [verifier]
 timeout_sec = 450.0

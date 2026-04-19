@@ -4,11 +4,11 @@ I’ve got a small C++ project in `/app` that used to build fine, but after spli
 
 Please fix the build configuration using only `CMakeLists.txt` changes. Don’t edit any `.cpp`, `.h`, or `.in` files.
 
-What I need working again is pretty straightforward from the outside:
-- clean out-of-source builds for both `Release` and `Debug`
-- clean builds should also work with the `Ninja` generator for both `Release` and `Debug`
-- both executables (`myapp` and `selfcheck`) must build and run
-- `myapp` should print:
+## Success criteria (what must work)
+
+- **Out-of-source builds** for **Release** and **Debug** succeed, and the same holds when using the **Ninja** generator.
+- **Both programs** `myapp` and `selfcheck` **build and run** for each configuration above.
+- **`myapp` stdout** (exact lines):
 
 ```
 text: HELLO
@@ -17,22 +17,26 @@ valid: yes
 profile: <build type>
 ```
 
-- `selfcheck` should print:
+- **`selfcheck` stdout** (exact line):
 
 ```
 selfcheck: ok (<build type>)
 ```
 
-The build-profile header should be generated per build type (so Release and Debug runs show the right profile). Also make sure dependency wiring is clean: `core` headers should be exported correctly, and `engine` should declare its dependency on `core` and thread support by using CMake’s Threads package target.
+  where `<build type>` is `Release` or `Debug` matching the configuration you built.
 
-Please keep language standard settings target-scoped (per target compile features) rather than a single global project-wide C++ standard. Concretely:
+- **Build profile in the binary**: the profile string in that output must reflect the active build type. The project ships `app/build_profile.h.in`; the configured header must appear in the **build tree** under the exact filename **`build_profile.h`** (one generated file per build directory, not committed under `app/` in the source tree).
 
-- Do **not** set `CMAKE_CXX_STANDARD` (or similar) at the top level; remove any project-wide C++ standard if present.
-- The **`core`** and **`plugin`** libraries are small and only need **C++17**: add `target_compile_features(core PUBLIC cxx_std_17)` and `target_compile_features(plugin PUBLIC cxx_std_17)`.
-- The **`engine`** static library and both executables use C++20 features in the existing sources: add `target_compile_features(engine PUBLIC cxx_std_20)`, `target_compile_features(myapp PRIVATE cxx_std_20)`, and `target_compile_features(selfcheck PRIVATE cxx_std_20)` so those translation units build as C++20 (this should show up in `compile_commands.json` for `engine/engine.cpp` and `app/main.cpp` when you export compile commands).
+- **Headers and dependencies**
+  - Targets that include **`core`** headers must obtain them through **`core`’s usage requirements** (dependents should not need extra manual include roots for `core`).
+  - **`engine`** must **link `core`** for headers and symbols, and must use **CMake’s portable threading integration** (the imported threading target CMake defines for `find_package(Threads)`), not only ad‑hoc raw linker flags, so the build stays portable.
+  - **`plugin`** must remain an **object-style library** in the final graph, and **`myapp` / `selfcheck`** must **pull in `plugin`’s objects** through normal CMake target relationships (not by wiring include paths straight to the plugin source tree on the app targets).
 
-Export `core`’s public headers with `target_include_directories(core PUBLIC ...)`, and have `engine` link to the `core` target (so include paths propagate). You may split CMake arguments across lines; keep **`core`** and **`PUBLIC`** as the first two arguments to `target_include_directories` for the `core` target.
+- **C++ language levels**
+  - **`core`** and **`plugin`** only need **C++17**-level language features for their sources.
+  - **`engine`**, **`myapp`**, and **`selfcheck`** need **C++20** for their sources (when compile commands are exported, the compile line for `engine/engine.cpp` and `app/main.cpp` should reflect a C++20 language mode).
+  - The **root** project must **not** pin a single global C++ standard for the whole tree; language levels must be **scoped to the targets** that need them.
 
-For threads, in **`engine/CMakeLists.txt`** call `find_package(Threads REQUIRED)` and link **`Threads::Threads`** to `engine` (that satisfies “CMake’s Threads package target”).
+## Scope
 
-One more thing: keep `plugin` as an object-library-style component in the final setup.
+You may reorganize targets, `configure_file`, link lines, and generator choices as long as the outcomes above hold and you only change **`CMakeLists.txt`** files.

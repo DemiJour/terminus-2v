@@ -1,7 +1,7 @@
 # When this file exists, Harbor uses it as the *entire* Compose project (single -f),
-# not as a merge layer. It must define build/image/volumes like the stock
-# docker-compose-build.yaml, plus any overrides (here: host networking to avoid
-# exhausting Docker bridge address pools on busy machines).
+# not as a merge layer. It must mirror stock docker-compose-build.yaml (build,
+# image, volumes, deploy, TEST_DIR) plus any overrides — here `network_mode: host`
+# to avoid exhausting Docker bridge address pools on busy machines.
 services:
   main:
     build:

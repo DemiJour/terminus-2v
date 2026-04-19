@@ -558,6 +558,10 @@ func run(inputPath, outputPath, wrapper string) error {
 	if err := os.WriteFile(outputPath, p.data, 0o755); err != nil {
 		return err
 	}
+	fmt.Fprintf(os.Stderr, "wrote patched ELF to %s with file mode %#o\n", outputPath, 0o755)
+	fmt.Fprintf(os.Stderr,
+		"relocation filter: R_X86_64_GLOB_DAT=%d R_X86_64_JUMP_SLOT=%d (malloc targets only)\n",
+		rX8664GlobDat, rX8664JumpSlot)
 	return nil
 }
 

@@ -1,0 +1,29 @@
+{
+    "id": "bdc3cc5b-4345-4042-ba86-d936dad0952d",
+    "started_at": "2026-04-19T11:52:14.111435",
+    "finished_at": "2026-04-19T11:53:18.297158",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 1.0
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "git-bisect-find-introducer__Xs6LbmZ"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

@@ -1,4 +1,0 @@
-Docker compose down failed: Docker compose command failed for environment cmake-fix-broken-build. Command: docker compose -p cmake-fix-broken-build__yt2p9pw -f /home/jour/.local/share/uv/tools/harbor/lib/python3.13/site-packages/harbor/environments/docker/docker-compose-build.yaml down --rmi all --volumes --remove-orphans. Return code: 1. Stdout:  Container cmake-fix-broken-build__yt2p9pw-main-1 Stopping 
- Container cmake-fix-broken-build__yt2p9pw-main-1 Error Error while Stopping
-Error response from daemon: cannot stop container: f3ddb9daa55e619248bd21775e8977df526ec6e71cfa6c197b3c53ec934747df: permission denied
-. Stderr: None. 

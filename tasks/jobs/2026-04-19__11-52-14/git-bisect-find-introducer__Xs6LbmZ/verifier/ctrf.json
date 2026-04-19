@@ -1,0 +1,119 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 11,
+            "passed": 11,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1776617584.1132064,
+            "stop": 1776617584.1774125
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_answer_file_exists",
+                "status": "passed",
+                "duration": 0.0008845120000842144,
+                "start": 1776617584.1694481,
+                "stop": 1776617584.1705296,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_answer_has_exactly_three_lines",
+                "status": "passed",
+                "duration": 0.00034043000005112845,
+                "start": 1776617584.1709564,
+                "stop": 1776617584.1713953,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_answer_line1_is_valid_commit_hash",
+                "status": "passed",
+                "duration": 0.00037703500015595637,
+                "start": 1776617584.1715024,
+                "stop": 1776617584.1719465,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_answer_line1_has_exactly_40_characters",
+                "status": "passed",
+                "duration": 0.0002262660000269534,
+                "start": 1776617584.1721294,
+                "stop": 1776617584.1724193,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_answer_line1_contains_only_lowercase_hex",
+                "status": "passed",
+                "duration": 0.0003371440000137227,
+                "start": 1776617584.1726964,
+                "stop": 1776617584.1731417,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_answer_line2_and_line3_non_empty",
+                "status": "passed",
+                "duration": 0.00023842500013415702,
+                "start": 1776617584.1733696,
+                "stop": 1776617584.1736872,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_answer_matches_expected_commit_subject_and_author",
+                "status": "passed",
+                "duration": 0.0003204569998160878,
+                "start": 1776617584.1739216,
+                "stop": 1776617584.1743333,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_answer_file_has_no_extra_trailing_newlines",
+                "status": "passed",
+                "duration": 0.0006561770001098921,
+                "start": 1776617584.1745725,
+                "stop": 1776617584.1753683,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_expected_commit_file_format",
+                "status": "passed",
+                "duration": 0.0003468679999514279,
+                "start": 1776617584.175533,
+                "stop": 1776617584.1759706,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_report_json_exists_and_is_valid_json",
+                "status": "passed",
+                "duration": 0.0002512460002890293,
+                "start": 1776617584.1761062,
+                "stop": 1776617584.1764393,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_report_json_schema_and_consistency",
+                "status": "passed",
+                "duration": 0.000387804000183678,
+                "start": 1776617584.1766684,
+                "stop": 1776617584.1771562,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

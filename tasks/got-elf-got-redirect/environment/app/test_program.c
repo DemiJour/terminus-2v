@@ -19,7 +19,7 @@ static unsigned long fib_hash(int n) {
 
 int main(void) {
   unsigned long acc = 0;
-  for (int i = 0; i < 120; ++i) {
+  for (int i = 0; i < 180; ++i) {
     void *p = malloc(16 + (i % 7));
     if (!p) {
       return 1;

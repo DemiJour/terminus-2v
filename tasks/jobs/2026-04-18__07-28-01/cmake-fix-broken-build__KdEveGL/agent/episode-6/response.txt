@@ -1,6 +1,0 @@
-{
-  "analysis": "Yes. We validated clean out-of-source builds for Debug/Release with both Ninja and Unix Makefiles; both myapp and selfcheck run and print exactly the expected output with correct per-build-type profile. CMake changes are confined to CMakeLists.txt files, with target-scoped compile features (C++17 for core/plugin, C++20 for engine/exes), proper dependency wiring (engine links core and Threads::Threads, core exports headers PUBLIC), and plugin remains an OBJECT library consumed via $<TARGET_OBJECTS:plugin>.",
-  "plan": "Mark task complete.",
-  "commands": [],
-  "task_complete": true
-}

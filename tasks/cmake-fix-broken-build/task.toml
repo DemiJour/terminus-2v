@@ -16,8 +16,9 @@ primary_language = "C++"
 domain = "Build Systems & Dependencies"
 tool = "CMake"
 task_type = "Fix Broken Build"
-# Required when environment/docker-compose.yaml is present (Harbor merges it with base compose).
-is_multi_container = true
+# Single service in docker-compose.yaml (only network_mode override for `main`).
+is_multi_container = false
+# Required when `environment/docker-compose.yaml` exists (edition_2 static checks).
 custom_docker_compose = true
 
 [verifier]
