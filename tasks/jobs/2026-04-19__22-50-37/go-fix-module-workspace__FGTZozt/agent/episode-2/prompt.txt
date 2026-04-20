@@ -1,0 +1,16 @@
+New Terminal Output:
+
+root@f7f934cf5910:/app# command -v go || true
+root@f7f934cf5910:/app# echo "$PATH"
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+root@f7f934cf5910:/app# ls -la /usr/local/go/bin/go 2>/dev/null || true
+-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
+root@f7f934cf5910:/app# ls -la /usr/local/bin/go 2>/dev/null || true
+root@f7f934cf5910:/app# ls -la /usr/bin/go 2>/dev/null || true
+root@f7f934cf5910:/app# find / -maxdepth 4 -type f -name go -path '*/bin/go' 2>/dev/null | head
+root@f7f934cf5910:/app# if [ -x /usr/local/go/bin/go ]; then export PATH="/usr/local/go/bin:$PATH"; fi
+root@f7f934cf5910:/app# command -v go && go version
+/usr/local/go/bin/go
+go version go1.22.2 linux/amd64
+root@f7f934cf5910:/app#
+

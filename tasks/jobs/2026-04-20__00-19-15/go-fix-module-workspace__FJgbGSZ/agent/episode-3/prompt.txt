@@ -1,0 +1,17 @@
+New Terminal Output:
+
+root@37bc2753abac:/app# export PATH=/usr/local/go/bin:$PATH
+root@37bc2753abac:/app# go version
+go version go1.22.2 linux/amd64
+root@37bc2753abac:/app# cat > go.work <<'EOF'
+> go 1.22
+>
+> use (
+> .
+> )
+> EOF
+root@37bc2753abac:/app# go test ./...
+mkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger
+

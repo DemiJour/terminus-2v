@@ -1,0 +1,47 @@
+{
+  "analysis": "We are at the module root (/app). The task indicates go.mod and go.work were edited incorrectly: module path must be ledger.local/harbor and go.work must only use the root module (.) and not reference a non-existent ./deprecated-pack. Next we need to inspect current go.mod/go.work, fix them, then run go test ./..., build the binary, and verify runtime output.",
+  "plan": "1) Inspect /app/go.mod and /app/go.work to see the current incorrect entries. 2) Edit go.mod to ensure the module line is exactly 'module ledger.local/harbor' and the go directive remains 'go 1.22'. 3) Edit go.work so it only contains a valid use directive pointing at '.' (or './') and remove the stray deprecated-pack member. 4) Run 'go test ./...' from /app to confirm tests pass. 5) Build the tool to /app/bin/ledger and run it to confirm it prints exactly the required single line.",
+  "commands": [
+    {
+      "keystrokes": "cd /app\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "printf '--- go.mod ---\\n'; cat go.mod; printf '\\n--- go.work ---\\n'; cat go.work\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "perl -0777 -i -pe 's/^module\\s+.*$/module ledger.local\\/harbor/m' go.mod\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "perl -0777 -i -pe 'die \"go directive not 1.22\\n\" unless /^go\\s+1\\.22\\s*$/m' go.mod\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > go.work <<'EOF'\ngo 1.22\n\nuse (\n\t.\n)\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "printf '--- fixed go.mod ---\\n'; cat go.mod; printf '\\n--- fixed go.work ---\\n'; cat go.work\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "go test ./...\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "mkdir -p /app/bin\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "go build -o /app/bin/ledger ./cmd/ledger\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "/app/bin/ledger\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

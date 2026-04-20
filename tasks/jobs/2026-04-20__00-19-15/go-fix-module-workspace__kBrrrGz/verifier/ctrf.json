@@ -1,0 +1,68 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 5,
+            "passed": 4,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1776662491.671446,
+            "stop": 1776662509.7274597
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_go_mod_declares_required_module_path",
+                "status": "passed",
+                "duration": 0.0006207660044310614,
+                "start": 1776662491.7180784,
+                "stop": 1776662491.7189195,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_go_mod_pins_toolchain_major_to_122",
+                "status": "passed",
+                "duration": 0.0004628949973266572,
+                "start": 1776662491.7191875,
+                "stop": 1776662491.7197733,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_go_work_exists_lists_only_root_and_drops_deprecated_pack",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0011426630007917993,
+                "start": 1776662491.7199018,
+                "stop": 1776662491.7328935,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "def test_go_work_exists_lists_only_root_and_drops_deprecated_pack() -> None:\n        \"\"\"go.work must exist, must not reference ./deprecated-pack, and use block must list only '.'.\"\"\"\n        path = ROOT / \"go.work\"\n        assert path.is_file(), \"/app/go.work must exist\"\n        work = _read_unix_text(path)\n        assert \"./deprecated-pack\" not in work\n        assert \"deprecated-pack\" not in work\n        m = re.search(r\"use\\s*\\((.*?)\\)\", work, flags=re.DOTALL | re.IGNORECASE)\n>       assert m, \"go.work must contain a use (...) block\"\nE       AssertionError: go.work must contain a use (...) block\nE       assert None\n\n/tests/test_outputs.py:60: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_go_test_all_packages_passes",
+                "status": "passed",
+                "duration": 17.84598718900088,
+                "start": 1776662491.733425,
+                "stop": 1776662509.5801938,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_go_build_and_ledger_cli_output",
+                "status": "passed",
+                "duration": 0.14673295200191205,
+                "start": 1776662509.580395,
+                "stop": 1776662509.7273073,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

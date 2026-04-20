@@ -1,0 +1,46 @@
+New Terminal Output:
+root@8911c2334661:/app# cd /app
+root@8911c2334661:/app# printf '--- go.mod ---\n'; cat go.mod; printf '\n--- go.work ---\n'; cat go.work
+bash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+module github.com/acme/wrongledger
+
+go 1.22
+
+--- go.work ---
+go 1.22
+
+use (
+        .
+        ./deprecated-pack
+)
+root@8911c2334661:/app# perl -0777 -i -pe 's/^module\s+.*$/module ledger.local\/harbor/m' go.mod
+root@8911c2334661:/app# perl -0777 -i -pe 'die "go directive not 1.22\n" unless /^go\s+1\.22\s*$/m' go.mod
+root@8911c2334661:/app# cat > go.work <<'EOF'
+> go 1.22
+>
+> use (
+> .
+> )
+> EOF
+root@8911c2334661:/app# printf '--- fixed go.mod ---\n'; cat go.mod; printf '\n--- fixed go.work ---\n'; cat go.work
+bash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+module ledger.local/harbor
+
+go 1.22
+
+--- fixed go.work ---
+go 1.22
+
+use (
+.
+)
+root@8911c2334661:/app# go test ./...
+bash: go: command not found
+root@8911c2334661:/app# mkdir -p /app/bin
+root@8911c2334661:/app# go build -o /app/bin/ledger ./cmd/ledger
+bash: go: command not found
+root@8911c2334661:/app# /app/bin/ledger
+bash: /app/bin/ledger: No such file or directory
+root@8911c2334661:/app#

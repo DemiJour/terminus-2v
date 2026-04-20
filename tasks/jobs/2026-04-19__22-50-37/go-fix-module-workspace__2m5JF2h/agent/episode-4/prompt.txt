@@ -1,0 +1,17 @@
+New Terminal Output:
+
+/app/bin/ledger
+
+Selecting previously unselected package golang-1.19-go.
+Preparing to unpack .../golang-1.19-go_1.19.8-2_amd64.deb ...
+Unpacking golang-1.19-go (1.19.8-2) ...
+
+export PATH=/usr/local/go/bin:$PATH
+command -v go
+go version
+cd /app
+go test ./...
+mkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger
+

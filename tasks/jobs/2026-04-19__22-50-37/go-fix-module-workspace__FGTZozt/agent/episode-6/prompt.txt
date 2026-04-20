@@ -1,0 +1,27 @@
+New Terminal Output:
+
+/app/bin/ledger | cat -A
+?       ledger.local/harbor/cmd/ledger  [no test files]
+ok      ledger.local/harbor/pkg/math    0.003s
+go test exit=0
+root@f7f934cf5910:/app# go build -o /app/bin/ledger ./cmd/ledger; echo "go build exit=$?"
+go build exit=0
+root@f7f934cf5910:/app# ls -la /app/bin/ledger
+-rwxr-xr-x 1 root root 1911534 Apr 20 03:52 /app/bin/ledger
+root@f7f934cf5910:/app# /app/bin/ledger | cat -A
+ledger: ready (42)$
+root@f7f934cf5910:/app# C-c
+bash: C-c: command not found
+root@f7f934cf5910:/app# go test ./...
+?       ledger.local/harbor/cmd/ledger  [no test files]
+ok      ledger.local/harbor/pkg/math    (cached)
+root@f7f934cf5910:/app# echo "go test exit=$?"
+go test exit=0
+root@f7f934cf5910:/app# go build -o /app/bin/ledger ./cmd/ledger
+root@f7f934cf5910:/app# echo "go build exit=$?"
+go build exit=0
+root@f7f934cf5910:/app# ls -la /app/bin/ledger
+-rwxr-xr-x 1 root root 1911534 Apr 20 03:52 /app/bin/ledger
+root@f7f934cf5910:/app# /app/bin/ledger | cat -A
+ledger: ready (42)$
+root@f7f934cf5910:/app#

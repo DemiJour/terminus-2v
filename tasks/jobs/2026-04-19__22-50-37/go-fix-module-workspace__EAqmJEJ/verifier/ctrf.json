@@ -1,0 +1,65 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 5,
+            "passed": 5,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1776657557.8021886,
+            "stop": 1776657558.1664727
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_go_mod_declares_required_module_path",
+                "status": "passed",
+                "duration": 0.0005283309947117232,
+                "start": 1776657557.864233,
+                "stop": 1776657557.8649879,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_go_mod_pins_toolchain_major_to_122",
+                "status": "passed",
+                "duration": 0.000445897996542044,
+                "start": 1776657557.8651412,
+                "stop": 1776657557.865707,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_go_work_exists_lists_only_root_and_drops_deprecated_pack",
+                "status": "passed",
+                "duration": 0.0003995139995822683,
+                "start": 1776657557.8658643,
+                "stop": 1776657557.866385,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_go_test_all_packages_passes",
+                "status": "passed",
+                "duration": 0.10877933700976428,
+                "start": 1776657557.8664908,
+                "stop": 1776657557.9754395,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_go_build_and_ledger_cli_output",
+                "status": "passed",
+                "duration": 0.1904920060042059,
+                "start": 1776657557.9756136,
+                "stop": 1776657558.166309,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

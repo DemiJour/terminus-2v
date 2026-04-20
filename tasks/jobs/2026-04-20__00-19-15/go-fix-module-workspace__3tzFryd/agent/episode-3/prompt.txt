@@ -1,0 +1,10 @@
+New Terminal Output:
+
+/app/bin/ledger
+cd /app
+export PATH="/usr/local/go/bin:$PATH"
+go test ./...
+mkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger | cat -A
+

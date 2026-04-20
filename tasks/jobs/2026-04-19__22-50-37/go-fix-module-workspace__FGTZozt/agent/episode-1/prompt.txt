@@ -1,0 +1,41 @@
+New Terminal Output:
+root@f7f934cf5910:/app# sed -n '1,120p' go.mod
+module github.com/acme/wrongledger
+
+go 1.22
+root@f7f934cf5910:/app# cat go.work
+go 1.22
+
+use (
+        .
+        ./deprecated-pack
+)
+root@f7f934cf5910:/app# cat > go.work <<'EOF'
+> go 1.22
+>
+> use (
+> .
+> )
+> EOF
+root@f7f934cf5910:/app# perl -0777 -i -pe 's/^module\s+.*$/module ledger.local\/harbor/m' go.mod
+root@f7f934cf5910:/app# go test ./...
+bash: go: command not found
+root@f7f934cf5910:/app# mkdir -p /app/bin
+root@f7f934cf5910:/app# go build -o /app/bin/ledger ./cmd/ledger
+bash: go: command not found
+root@f7f934cf5910:/app# /app/bin/ledger
+bash: /app/bin/ledger: No such file or directory
+root@f7f934cf5910:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+

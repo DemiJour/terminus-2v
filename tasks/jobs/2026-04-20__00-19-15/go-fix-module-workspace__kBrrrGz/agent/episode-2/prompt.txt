@@ -1,0 +1,23 @@
+New Terminal Output:
+
+root@b735098e9e97:/app# cd /app
+root@b735098e9e97:/app# cat > go.work <<'EOF'
+> go 1.22
+>
+> use .
+> EOF
+root@b735098e9e97:/app# echo '--- go.mod ---'; cat go.mod; echo; echo '--- go.work ---'; cat go.work
+--- go.mod ---
+module ledger.local/harbor
+
+go 1.22
+
+--- go.work ---
+go 1.22
+
+use .
+root@b735098e9e97:/app# command -v go || echo 'go not in PATH'
+go not in PATH
+root@b735098e9e97:/app# go version
+bash: go: command not found
+root@b735098e9e97:/app#

@@ -1,0 +1,58 @@
+New Terminal Output:
+
+root@f85a0afb7388:/app# cat > /app/go.mod <<'EOF'
+> module ledger.local/harbor
+>
+> go 1.22
+> EOF
+root@f85a0afb7388:/app# cat > /app/go.work <<'EOF'
+> go 1.22
+>
+> use (
+> .
+> )
+> EOF
+root@f85a0afb7388:/app# cat /app/go.mod
+module ledger.local/harbor
+
+go 1.22
+root@f85a0afb7388:/app# cat /app/go.work
+go 1.22
+
+use (
+.
+)
+root@f85a0afb7388:/app# command -v go || true
+root@f85a0afb7388:/app# ls -la /usr/local/go/bin/go /usr/bin/go 2>/dev/null || true
+-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
+root@f85a0afb7388:/app# find / -maxdepth 4 -type f -name go 2>/dev/null | head -n 50
+root@f85a0afb7388:/app# apt-get update
+Hit:1 http://deb.debian.org/debian bookworm InRelease
+Hit:2 http://deb.debian.org/debian bookworm-updates InRelease
+Hit:3 http://deb.debian.org/debian-security bookworm-security InRelease
+Reading package lists... Done
+root@f85a0afb7388:/app# apt-get install -y golang-go
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  golang-1.19-go golang-1.19-src golang-src
+Suggested packages:
+  bzr | brz
+The following NEW packages will be installed:
+  golang-1.19-go golang-1.19-src golang-go golang-src
+0 upgraded, 4 newly installed, 0 to remove and 95 not upgraded.
+Need to get 81.1 MB of archives.
+After this operation, 464 MB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-src all 1.19.8-2 [18.3 MB]
+Get:2 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-go amd64 1.19.8-2 [62.7 MB]
+25% [2 golang-1.19-go 2277 kB/62.7 MB 4%]                                                                                                         1258 kB/s 48sg
+o version
+go test ./...
+30% [2 golang-1.19-go 7483 kB/62.7 MB 12%]                                                                                                        1559 kB/s 35sm
+kdir -p /app/bin
+31% [2 golang-1.19-go 8044 kB/62.7 MB 13%]                                                                                                        1559 kB/s 35sg
+o build -o /app/bin/ledger ./cmd/ledger
+32% [2 golang-1.19-go 9261 kB/62.7 MB 15%]                                                                                                        1559 kB/s 34s/
+app/bin/ledger
+33% [2 golang-1.19-go 9860 kB/62.7 MB 16%]                                                                                                        1559 kB/s 33s

@@ -1,0 +1,115 @@
+[?2004hroot@cd3fbfd37d77:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@cd3fbfd37d77:/app# clear
+[?2004l[H[J[3J[?2004hroot@cd3fbfd37d77:/app# cd /app
+[?2004l[?2004hroot@cd3fbfd37d77:/app# printf '--- go.mod ---\n'; sed -n '1,200p' go.mod
+[?2004lbash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+module github.com/acme/wrongledger
+
+go 1.22
+[?2004hroot@cd3fbfd37d77:/app# printf '--- go.work ---\n'; sed -n '1,200p' go.work
+[?2004lbash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+go 1.22
+
+use (
+	.
+	./deprecated-pack
+)
+[?2004hroot@cd3fbfd37d77:/app# apply_patch <<'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: go.mod
+[?2004l[?2004h> @@
+[?2004l[?2004h> -module ledger.local/harbor
+[?2004l[?2004h> +module ledger.local/harbor
+[?2004l[?2004h> @@
+[?2004l[?2004h> -go 1.22
+[?2004l[?2004h> +go 1.22
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: apply_patch: command not found
+[?2004hroot@cd3fbfd37d77:/app# apply_patch <<'PATCH'
+[?2004l[?2004h> *** Begin Patch
+[?2004l[?2004h> *** Update File: go.work
+[?2004l[?2004h> @@
+[?2004l[?2004h> -use (
+[?2004l[?2004h> -.
+[?2004l[?2004h> -./deprecated-pack
+[?2004l[?2004h> -)
+[?2004l[?2004h> +use (
+[?2004l[?2004h> +.
+[?2004l[?2004h> +)
+[?2004l[?2004h> *** End Patch
+[?2004l[?2004h> PATCH
+[?2004lbash: apply_patch: command not found
+[?2004hroot@cd3fbfd37d77:/app# go test ./...
+[?2004lbash: go: command not found
+[?2004hroot@cd3fbfd37d77:/app# mkdir -p /app/bin
+[?2004l[?2004hroot@cd3fbfd37d77:/app# go build -o /app/bin/ledger ./cmd/ledger
+[?2004lbash: go: command not found
+[?2004hroot@cd3fbfd37d77:/app# /app/bin/ledger
+[?2004lbash: /app/bin/ledger: No such file or directory
+[?2004hroot@cd3fbfd37d77:/app# cd /app
+[?2004l[?2004hroot@cd3fbfd37d77:/app# cat > /app/go.mod <<'EOF'
+[?2004l[?2004h> module ledger.local/harbor
+[?2004l[?2004h> 
+[?2004l[?2004h> go 1.22
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@cd3fbfd37d77:/app# cat > /app/go.work <<'EOF'
+[?2004l[?2004h> go 1.22
+[?2004l[?2004h> 
+[?2004l[?2004h> use (
+[?2004l[?2004h> .
+[?2004l[?2004h> )
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@cd3fbfd37d77:/app# echo '--- go.mod ---'; cat /app/go.mod; echo '--- go.work ---'; cat /app/go.work
+[?2004l--- go.mod ---
+module ledger.local/harbor
+
+go 1.22
+--- go.work ---
+go 1.22
+
+use (
+.
+)
+[?2004hroot@cd3fbfd37d77:/app# command -v go || true; ls -la /usr/local/go/bin/go /usr/bin/go /bin/go 2>/dev/null || true
+[?2004l-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
+[?2004hroot@cd3fbfd37d77:/app# if [ -x /usr/local/go/bin/go ]; then export PATH=/usr/local/go/bin:$PATH; fi; command -v go; go version
+[?2004l/usr/local/go/bin/go
+go version go1.22.2 linux/amd64
+[?2004hroot@cd3fbfd37d77:/app# cd /app
+[?2004l[?2004hroot@cd3fbfd37d77:/app# export PATH=/usr/local/go/bin:$PATH
+[?2004l[?2004hroot@cd3fbfd37d77:/app# go test ./...
+[?2004lmkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger | cat -A
+out=$(/app/bin/ledger); printf '%s' "$out" | wc -l; printf '%s' "$out" | cat -A
+^C
+[?2004hroot@cd3fbfd37d77:/app# 
+[?2004l[?2004hroot@cd3fbfd37d77:/app# cd /app
+[?2004l[?2004hroot@cd3fbfd37d77:/app# export PATH=/usr/local/go/bin:$PATH
+[?2004l[?2004hroot@cd3fbfd37d77:/app# go version
+[?2004lgo version go1.22.2 linux/amd64
+[?2004hroot@cd3fbfd37d77:/app# go test ./...
+[?2004l?   	ledger.local/harbor/cmd/ledger	[no test files]
+ok  	ledger.local/harbor/pkg/math	0.002s
+[?2004hroot@cd3fbfd37d77:/app# go build -o /app/bin/ledger ./cmd/ledger
+[?2004l[?2004hroot@cd3fbfd37d77:/app# /app/bin/ledger | cat -A
+[?2004lledger: ready (42)$
+[?2004hroot@cd3fbfd37d77:/app# cd /app
+[?2004l[?2004hroot@cd3fbfd37d77:/app# sed -n '1,20p' /app/go.mod
+[?2004lmodule ledger.local/harbor
+
+go 1.22
+[?2004hroot@cd3fbfd37d77:/app# sed -n '1,20p' /app/go.work
+[?2004lgo 1.22
+
+use (
+.
+)
+[?2004hroot@cd3fbfd37d77:/app# ls -la /app/bin/ledger
+[?2004l-rwxr-xr-x 1 root root 1911534 Apr 20 05:21 /app/bin/ledger
+[?2004hroot@cd3fbfd37d77:/app# 

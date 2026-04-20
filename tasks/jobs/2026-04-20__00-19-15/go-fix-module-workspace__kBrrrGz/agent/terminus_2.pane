@@ -1,0 +1,81 @@
+[?2004hroot@b735098e9e97:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@b735098e9e97:/app# [Kroot@b735098e9e97:/app# clear
+[?2004l[H[J[3J[?2004hroot@b735098e9e97:/app# cd /app
+[?2004l[?2004hroot@b735098e9e97:/app# ls -la
+[?2004ltotal 36
+drwxr-xr-x 1 root root 4096 Apr 20 03:40 .
+drwxr-xr-x 1 root root 4096 Apr 20 05:19 ..
+drwxr-xr-x 1 root root 4096 Apr 20 03:40 cmd
+-rw-r--r-- 1 root root   44 Apr 20 03:40 go.mod
+-rw-r--r-- 1 root root   39 Apr 20 03:40 go.work
+drwxr-xr-x 1 root root 4096 Apr 20 03:40 pkg
+[?2004hroot@b735098e9e97:/app# printf '--- go.mod ---\n'; cat go.mod; printf '\n--- go.work ---\n'; cat go.work
+[?2004lbash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+module github.com/acme/wrongledger
+
+go 1.22
+
+--- go.work ---
+go 1.22
+
+use (
+	.
+	./deprecated-pack
+)
+[?2004hroot@b735098e9e97:/app# perl -0777 -i -pe 's/^module\s+.*$/module ledger.local\/harbor/m' go.mod
+[?2004l[?2004hroot@b735098e9e97:/app# perl -0777 -i -pe 's/^use\s*\(.*?^\)\s*$/use (\n\t.\n)/ms; s/^use\s+.*$/use .\n/m' go.work
+[?2004l[?2004hroot@b735098e9e97:/app# printf '--- go.mod (after) ---\n'; cat go.mod; printf '\n--- go.work (after) ---\n'; cat go.work
+[?2004lbash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+module ledger.local/harbor
+
+go 1.22
+
+--- go.work (after) ---
+go 1.22
+
+use .
+
+	.
+)[?2004hroot@b735098e9e97:/app# go test ./...
+[?2004lbash: go: command not found
+[?2004hroot@b735098e9e97:/app# mkdir -p /app/bin
+[?2004l[?2004hroot@b735098e9e97:/app# go build -o /app/bin/ledger ./cmd/ledger
+[?2004lbash: go: command not found
+[?2004hroot@b735098e9e97:/app# /app/bin/ledger
+[?2004lbash: /app/bin/ledger: No such file or directory
+[?2004hroot@b735098e9e97:/app# cd /app
+[?2004l[?2004hroot@b735098e9e97:/app# cat > go.work <<'EOF'
+[?2004l[?2004h> go 1.22
+[?2004l[?2004h> 
+[?2004l[?2004h> use .
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@b735098e9e97:/app# echo '--- go.mod ---'; cat go.mod; echo; echo '--- go.work ---'; cat go.work
+[?2004l--- go.mod ---
+module ledger.local/harbor
+
+go 1.22
+
+--- go.work ---
+go 1.22
+
+use .
+[?2004hroot@b735098e9e97:/app# command -v go || echo 'go not in PATH'
+[?2004lgo not in PATH
+[?2004hroot@b735098e9e97:/app# go version
+[?2004lbash: go: command not found
+[?2004hroot@b735098e9e97:/app# cd /app
+[?2004l[?2004hroot@b735098e9e97:/app# find /app -maxdepth 3 -name 'go.mod' -o -name 'go.work' -print
+[?2004l/app/go.work
+[?2004hroot@b735098e9e97:/app# sed -n '1,120p' /app/go.mod
+[?2004lmodule ledger.local/harbor
+
+go 1.22
+[?2004hroot@b735098e9e97:/app# sed -n '1,120p' /app/go.work
+[?2004lgo 1.22
+
+use .
+[?2004hroot@b735098e9e97:/app# 

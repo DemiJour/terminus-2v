@@ -1,0 +1,35 @@
+{
+    "id": "e3d59a65-cb43-409b-a170-820cc5e99c83",
+    "started_at": "2026-04-20T00:19:15.330079",
+    "finished_at": "2026-04-20T00:23:03.353128",
+    "n_total_trials": 5,
+    "stats": {
+        "n_trials": 5,
+        "n_errors": 0,
+        "evals": {
+            "terminus-2__gpt-5.2__adhoc": {
+                "n_trials": 5,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.8
+                    }
+                ],
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "go-fix-module-workspace__FJgbGSZ",
+                            "go-fix-module-workspace__3tzFryd",
+                            "go-fix-module-workspace__S4tRWXj",
+                            "go-fix-module-workspace__8La47SV"
+                        ],
+                        "0.0": [
+                            "go-fix-module-workspace__kBrrrGz"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

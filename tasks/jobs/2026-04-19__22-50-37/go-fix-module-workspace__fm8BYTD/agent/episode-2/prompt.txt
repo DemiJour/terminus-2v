@@ -1,0 +1,54 @@
+New Terminal Output:
+
+root@ac7c69b9db0f:/app# command -v go || true
+root@ac7c69b9db0f:/app# ls -la /usr/local/go/bin/go /usr/lib/go/bin/go /opt/go/bin/go 2>/dev/null || true
+-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
+root@ac7c69b9db0f:/app# ls -la /usr/local/go/bin 2>/dev/null || true
+total 14948
+drwxr-xr-x  2 root root     4096 Mar 29  2024 .
+drwxr-xr-x 10 root root     4096 Apr 10  2024 ..
+-rwxr-xr-x  1 root root 12684603 Mar 29  2024 go
+-rwxr-xr-x  1 root root  2610828 Mar 29  2024 gofmt
+root@ac7c69b9db0f:/app# export PATH="/usr/local/go/bin:$PATH"; command -v go; go version
+/usr/local/go/bin/go
+go version go1.22.2 linux/amd64
+root@ac7c69b9db0f:/app# cat /etc/os-release
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+root@ac7c69b9db0f:/app# apt-get update -y
+Hit:1 http://deb.debian.org/debian bookworm InRelease
+Hit:2 http://deb.debian.org/debian bookworm-updates InRelease
+Hit:3 http://deb.debian.org/debian-security bookworm-security InRelease
+Reading package lists... Done
+root@ac7c69b9db0f:/app# apt-get install -y golang-go
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  golang-1.19-go golang-1.19-src golang-src
+Suggested packages:
+  bzr | brz
+The following NEW packages will be installed:
+  golang-1.19-go golang-1.19-src golang-go golang-src
+0 upgraded, 4 newly installed, 0 to remove and 95 not upgraded.
+Need to get 81.1 MB of archives.
+After this operation, 464 MB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-src all 1.19.8-2 [18.3 MB]
+Get:2 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-go amd64 1.19.8-2 [62.7 MB]
+38% [2 golang-1.19-go 14.7 MB/62.7 MB 23%]                                                                                                        1371 kB/s 35sc
+ommand -v go && go version
+go test ./...
+59% [2 golang-1.19-go 36.8 MB/62.7 MB 59%]                                                                                                         2897 kB/s 8sm
+kdir -p /app/bin
+62% [2 golang-1.19-go 39.7 MB/62.7 MB 63%]                                                                                                         2897 kB/s 7sg
+o build -o /app/bin/ledger ./cmd/ledger
+81% [2 golang-1.19-go 58.3 MB/62.7 MB 93%]                                                                                                         1893 kB/s 2s/
+app/bin/ledger
+

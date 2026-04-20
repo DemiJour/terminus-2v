@@ -1,0 +1,12 @@
+New Terminal Output:
+
+/app/bin/ledger
+
+ps aux | grep -E 'go test' | grep -v grep || true
+cd /app
+go test ./...
+mkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+test -x /app/bin/ledger && echo OK
+/app/bin/ledger | cat -A
+

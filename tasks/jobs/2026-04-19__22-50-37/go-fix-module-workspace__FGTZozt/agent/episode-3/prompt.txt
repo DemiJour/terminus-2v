@@ -1,0 +1,16 @@
+New Terminal Output:
+
+root@f7f934cf5910:/app# cat go.mod
+module ledger.local/harbor
+
+go 1.22
+root@f7f934cf5910:/app# cat go.work
+go 1.22
+
+use (
+.
+)
+root@f7f934cf5910:/app# go test ./...
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger
+

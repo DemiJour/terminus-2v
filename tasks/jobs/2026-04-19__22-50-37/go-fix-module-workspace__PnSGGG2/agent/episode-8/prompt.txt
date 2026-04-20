@@ -1,0 +1,23 @@
+New Terminal Output:
+
+/app/bin/ledger | cat -A
+?       ledger.local/harbor/cmd/ledger  [no test files]
+ok      ledger.local/harbor/pkg/math    0.097s
+root@832c1bca13a1:/app# go build -o /app/bin/ledger ./cmd/ledger
+root@832c1bca13a1:/app# ls -la /app/bin/ledger
+-rwxr-xr-x 1 root root 1911534 Apr 20 03:58 /app/bin/ledger
+root@832c1bca13a1:/app# /app/bin/ledger | cat -A
+ledger: ready (42)$
+root@832c1bca13a1:/app# go test ./...; echo "go test exit=$?"
+?       ledger.local/harbor/cmd/ledger  [no test files]
+ok      ledger.local/harbor/pkg/math    (cached)
+go test exit=0
+root@832c1bca13a1:/app# go build -o /app/bin/ledger ./cmd/ledger; echo "go build exit=$?"
+go build exit=0
+root@832c1bca13a1:/app# test -x /app/bin/ledger && echo "ledger exists" || (echo "ledger missing"; exit 1)
+ledger exists
+root@832c1bca13a1:/app# /app/bin/ledger
+ledger: ready (42)
+root@832c1bca13a1:/app# /app/bin/ledger | cat -A
+ledger: ready (42)$
+root@832c1bca13a1:/app#

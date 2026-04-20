@@ -1,0 +1,19 @@
+New Terminal Output:
+
+root@8911c2334661:/app# cd /app
+root@8911c2334661:/app# command -v go || true
+root@8911c2334661:/app# ls -la /usr/local/go/bin/go /usr/lib/go/bin/go /usr/lib/go-*/bin/go 2>/dev/null || true
+-rwxr-xr-x 1 root root 12684603 Mar 29  2024  /usr/local/go/bin/go
+root@8911c2334661:/app# find / -maxdepth 4 -type f -name go -path '*/bin/go' 2>/dev/null | head -n 50
+root@8911c2334661:/app# if [ -x /usr/local/go/bin/go ]; then export PATH="/usr/local/go/bin:$PATH"; fi; command -v go && go version || true
+/usr/local/go/bin/go
+go version go1.22.2 linux/amd64
+root@8911c2334661:/app# if ! command -v go >/dev/null 2>&1; then (apt-get update -y && apt-get install -y golang-go) || (apk add --no-cache go) || true; fi
+root@8911c2334661:/app# command -v go && go version
+/usr/local/go/bin/go
+go version go1.22.2 linux/amd64
+root@8911c2334661:/app# go test ./...
+mkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger
+

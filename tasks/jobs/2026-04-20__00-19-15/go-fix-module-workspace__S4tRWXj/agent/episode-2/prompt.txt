@@ -1,0 +1,32 @@
+New Terminal Output:
+
+root@cd3fbfd37d77:/app# cd /app
+root@cd3fbfd37d77:/app# cat > /app/go.mod <<'EOF'
+> module ledger.local/harbor
+>
+> go 1.22
+> EOF
+root@cd3fbfd37d77:/app# cat > /app/go.work <<'EOF'
+> go 1.22
+>
+> use (
+> .
+> )
+> EOF
+root@cd3fbfd37d77:/app# echo '--- go.mod ---'; cat /app/go.mod; echo '--- go.work ---'; cat /app/go.work
+--- go.mod ---
+module ledger.local/harbor
+
+go 1.22
+--- go.work ---
+go 1.22
+
+use (
+.
+)
+root@cd3fbfd37d77:/app# command -v go || true; ls -la /usr/local/go/bin/go /usr/bin/go /bin/go 2>/dev/null || true
+-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
+root@cd3fbfd37d77:/app# if [ -x /usr/local/go/bin/go ]; then export PATH=/usr/local/go/bin:$PATH; fi; command -v go; go version
+/usr/local/go/bin/go
+go version go1.22.2 linux/amd64
+root@cd3fbfd37d77:/app#

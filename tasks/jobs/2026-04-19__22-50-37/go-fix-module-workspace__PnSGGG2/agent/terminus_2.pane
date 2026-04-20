@@ -1,0 +1,177 @@
+[?2004hroot@832c1bca13a1:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@832c1bca13a1:/app# clear
+[?2004l[H[J[3J[?2004hroot@832c1bca13a1:/app# pwd
+[?2004l/app
+[?2004hroot@832c1bca13a1:/app# ls -la
+[?2004ltotal 36
+drwxr-xr-x 1 root root 4096 Apr 20 03:40 .
+drwxr-xr-x 1 root root 4096 Apr 20 03:50 ..
+drwxr-xr-x 1 root root 4096 Apr 20 03:40 cmd
+-rw-r--r-- 1 root root   44 Apr 20 03:40 go.mod
+-rw-r--r-- 1 root root   39 Apr 20 03:40 go.work
+drwxr-xr-x 1 root root 4096 Apr 20 03:40 pkg
+[?2004hroot@832c1bca13a1:/app# sed -n '1,120p' go.mod
+[?2004lmodule github.com/acme/wrongledger
+
+go 1.22
+[?2004hroot@832c1bca13a1:/app# cat go.work
+[?2004lgo 1.22
+
+use (
+	.
+	./deprecated-pack
+)
+[?2004hroot@832c1bca13a1:/app# cat > go.mod <<'EOF'
+[?2004l[?2004h> module ledger.local/harbor
+[?2004l[?2004h> 
+[?2004l[?2004h> go 1.22
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@832c1bca13a1:/app# cat > go.work <<'EOF'
+[?2004l[?2004h> go 1.22
+[?2004l[?2004h> 
+[?2004l[?2004h> use (
+[?2004l[?2004h> .
+[?2004l[?2004h> )
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@832c1bca13a1:/app# go test ./...
+[?2004lbash: go: command not found
+[?2004hroot@832c1bca13a1:/app# mkdir -p /app/bin
+[?2004l[?2004hroot@832c1bca13a1:/app# go build -o /app/bin/ledger ./cmd/ledger
+[?2004lbash: go: command not found
+[?2004hroot@832c1bca13a1:/app# /app/bin/ledger
+[?2004lbash: /app/bin/ledger: No such file or directory
+[?2004hroot@832c1bca13a1:/app# command -v go || true
+[?2004l[?2004hroot@832c1bca13a1:/app# echo "$PATH"
+[?2004l/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+[?2004hroot@832c1bca13a1:/app# ls -la /usr/local/go/bin/go /usr/bin/go 2>/dev/null || true
+[?2004l-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
+[?2004hroot@832c1bca13a1:/app# ls -la /usr/local/go 2>/dev/null || true
+[?2004ltotal 80
+drwxr-xr-x 10 root root  4096 Apr 10  2024 .
+drwxr-xr-x  1 root root  4096 Apr 10  2024 ..
+-rw-r--r--  1 root root  1337 Mar 29  2024 CONTRIBUTING.md
+-rw-r--r--  1 root root  1479 Mar 29  2024 LICENSE
+-rw-r--r--  1 root root  1303 Mar 29  2024 PATENTS
+-rw-r--r--  1 root root  1455 Mar 29  2024 README.md
+-rw-r--r--  1 root root   426 Mar 29  2024 SECURITY.md
+-rw-r--r--  1 root root    35 Mar 29  2024 VERSION
+drwxr-xr-x  2 root root  4096 Mar 29  2024 api
+drwxr-xr-x  2 root root  4096 Mar 29  2024 bin
+-rw-r--r--  1 root root    52 Mar 29  2024 codereview.cfg
+drwxr-xr-x  2 root root  4096 Mar 29  2024 doc
+-rw-r--r--  1 root root   505 Mar 29  2024 go.env
+drwxr-xr-x  3 root root  4096 Mar 29  2024 lib
+drwxr-xr-x  8 root root  4096 Mar 29  2024 misc
+drwxr-xr-x  4 root root  4096 Mar 29  2024 pkg
+drwxr-xr-x 53 root root  4096 Mar 29  2024 src
+drwxr-xr-x 26 root root 12288 Mar 29  2024 test
+[?2004hroot@832c1bca13a1:/app# cat /etc/os-release || true
+[?2004lPRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+[?2004hroot@832c1bca13a1:/app# apt-get update -y
+[?2004l0% [Working]0% [Connecting to debian.map.fastlydns.net]                                           0% [Waiting for headers]                        Hit:1 http://deb.debian.org/debian bookworm InRelease
+                        0% [Working]0% [Waiting for headers]                        Hit:2 http://deb.debian.org/debian bookworm-updates InRelease
+                        0% [Working]0% [Waiting for headers]                        Hit:3 http://deb.debian.org/debian-security bookworm-security InRelease
+                        0% [Working]20% [Working]             Reading package lists... 0%Reading package lists... 0%Reading package lists... 0%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 99%Reading package lists... 99%Reading package lists... Done
+[?2004hroot@832c1bca13a1:/app# apt-get install -y golang-go
+[?2004lReading package lists... 0%Reading package lists... 0%Reading package lists... 0%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 95%Reading package lists... 99%Reading package lists... 99%Reading package lists... Done
+Building dependency tree... 0%Building dependency tree... 0%Building dependency tree... 50%Building dependency tree... 50%Building dependency tree... Done
+Reading state information... 0% Reading state information... 0%Reading state information... Done
+The following additional packages will be installed:
+  golang-1.19-go golang-1.19-src golang-src
+Suggested packages:
+  bzr | brz
+The following NEW packages will be installed:
+  golang-1.19-go golang-1.19-src golang-go golang-src
+0 upgraded, 4 newly installed, 0 to remove and 95 not upgraded.
+Need to get 81.1 MB of archives.
+After this operation, 464 MB of additional disk space will be used.
+0% [Working]0% [Working]0% [Connecting to debian.map.fastlydns.net]                                           0% [Waiting for headers]                        Get:1 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-src all 1.19.8-2 [18.3 MB]
+0% [1 golang-1.19-src 6954 B/18.3 MB 0%]0% [1 golang-1.19-src 27.0 kB/18.3 MB 0%]                                         0% [1 golang-1.19-src 116 kB/18.3 MB 1%]0% [1 golang-1.19-src 151 kB/18.3 MB 1%]0% [1 golang-1.19-src 177 kB/18.3 MB 1%]0% [1 golang-1.19-src 244 kB/18.3 MB 1%]0% [1 golang-1.19-src 284 kB/18.3 MB 2%]0% [1 golang-1.19-src 414 kB/18.3 MB 2%]0% [1 golang-1.19-src 469 kB/18.3 MB 3%]0% [1 golang-1.19-src 500 kB/18.3 MB 3%]                                                                                                    80.1 kB/s 16min 45s1% [1 golang-1.19-src 777 kB/18.3 MB 4%]                                                                                                    80.1 kB/s 16min 41s1% [1 golang-1.19-src 807 kB/18.3 MB 4%]                                                                                                    80.1 kB/s 16min 41s1% [1 golang-1.19-src 811 kB/18.3 MB 4%]                                                                                                    80.1 kB/s 16min 41s1% [1 golang-1.19-src 1215 kB/18.3 MB 7%]                                                                                                   80.1 kB/s 16min 36s1% [1 golang-1.19-src 1459 kB/18.3 MB 8%]                                                                                                   80.1 kB/s 16min 33s2% [1 golang-1.19-src 1532 kB/18.3 MB 8%]                                                                                                   80.1 kB/s 16min 32s2% [1 golang-1.19-src 1576 kB/18.3 MB 9%]                                                                                                   80.1 kB/s 16min 31s2% [1 golang-1.19-src 1844 kB/18.3 MB 10%]                                                                                                  80.1 kB/s 16min 28s2% [1 golang-1.19-src 2050 kB/18.3 MB 11%]                                                                                                  80.1 kB/s 16min 25s3% [1 golang-1.19-src 2608 kB/18.3 MB 14%]                                                                                                  80.1 kB/s 16min 18s3% [1 golang-1.19-src 2675 kB/18.3 MB 15%]                                                                                                  80.1 kB/s 16min 18s3% [1 golang-1.19-src 3260 kB/18.3 MB 18%]                                                                                                    440 kB/s 2min 56s3% [1 golang-1.19-src 3407 kB/18.3 MB 19%]                                                                                                    440 kB/s 2min 56s4% [1 golang-1.19-src 3883 kB/18.3 MB 21%]                                                                                                    440 kB/s 2min 55s4% [1 golang-1.19-src 3969 kB/18.3 MB 22%]                                                                                                    440 kB/s 2min 55s4% [1 golang-1.19-src 4250 kB/18.3 MB 23%]                                                                                                    440 kB/s 2min 54s4% [1 golang-1.19-src 4351 kB/18.3 MB 24%]                                                                                                    440 kB/s 2min 54s5% [1 golang-1.19-src 4695 kB/18.3 MB 26%]                                                                                                    440 kB/s 2min 53s5% [1 golang-1.19-src 4725 kB/18.3 MB 26%]                                                                                                    440 kB/s 2min 53s5% [1 golang-1.19-src 4904 kB/18.3 MB 27%]                                                                                                    440 kB/s 2min 53s6% [1 golang-1.19-src 5735 kB/18.3 MB 31%]                                                                                                    440 kB/s 2min 51s6% [1 golang-1.19-src 5824 kB/18.3 MB 32%]                                                                                                    440 kB/s 2min 50s6% [1 golang-1.19-src 6058 kB/18.3 MB 33%]                                                                                                    440 kB/s 2min 50s6% [1 golang-1.19-src 6156 kB/18.3 MB 34%]                                                                                                    481 kB/s 2min 35s6% [1 golang-1.19-src 6356 kB/18.3 MB 35%]                                                                                                    481 kB/s 2min 35s7% [1 golang-1.19-src 6839 kB/18.3 MB 37%]                                                                                                    481 kB/s 2min 34s7% [1 golang-1.19-src 6839 kB/18.3 MB 37%]                                                                                                    481 kB/s 2min 34s7% [1 golang-1.19-src 7099 kB/18.3 MB 39%]                                                                                                    481 kB/s 2min 33s7% [1 golang-1.19-src 7456 kB/18.3 MB 41%]                                                                                                    481 kB/s 2min 32s7% [1 golang-1.19-src 7535 kB/18.3 MB 41%]                                                                                                    481 kB/s 2min 32s8% [1 golang-1.19-src 7790 kB/18.3 MB 43%]                                                                                                    481 kB/s 2min 32s8% [1 golang-1.19-src 7967 kB/18.3 MB 44%]                                                                                                    481 kB/s 2min 31s8% [1 golang-1.19-src 8294 kB/18.3 MB 45%]                                                                                                    481 kB/s 2min 31s8% [1 golang-1.19-src 8529 kB/18.3 MB 47%]                                                                                                    481 kB/s 2min 30s9% [1 golang-1.19-src 8851 kB/18.3 MB 48%]                                                                                                    481 kB/s 2min 30s10% [1 golang-1.19-src 9926 kB/18.3 MB 54%]                                                                                                   627 kB/s 1min 53s10% [1 golang-1.19-src 10.2 MB/18.3 MB 56%]                                                                                                   627 kB/s 1min 52s11% [1 golang-1.19-src 10.9 MB/18.3 MB 60%]                                                                                                   627 kB/s 1min 51s11% [1 golang-1.19-src 10.9 MB/18.3 MB 60%]                                                                                                   627 kB/s 1min 51s12% [1 golang-1.19-src 12.5 MB/18.3 MB 68%]                                                                                                   627 kB/s 1min 49s12% [1 golang-1.19-src 12.5 MB/18.3 MB 68%]                                                                                                   627 kB/s 1min 49s13% [1 golang-1.19-src 13.4 MB/18.3 MB 73%]                                                                                                   627 kB/s 1min 47s14% [1 golang-1.19-src 14.0 MB/18.3 MB 77%]                                                                                                   627 kB/s 1min 46s14% [1 golang-1.19-src 14.6 MB/18.3 MB 80%]                                                                                                   627 kB/s 1min 45s14% [1 golang-1.19-src 14.6 MB/18.3 MB 80%]                                                                                                   627 kB/s 1min 45s17% [1 golang-1.19-src 16.8 MB/18.3 MB 92%]                                                                                                   627 kB/s 1min 42s17% [1 golang-1.19-src 17.3 MB/18.3 MB 94%]                                                                                                   627 kB/s 1min 41s17% [1 golang-1.19-src 17.4 MB/18.3 MB 95%]                                                                                                       1245 kB/s 51s23% [Waiting for headers]                                                                                                                         1245 kB/s 50s                                                                                                                                                               Get:2 http://deb.debian.org/debian bookworm/main amd64 golang-1.19-go amd64 1.19.8-2 [62.7 MB]
+23% [2 golang-1.19-go 106 kB/62.7 MB 0%]                                                                                                          1245 kB/s 50s24% [2 golang-1.19-go 575 kB/62.7 MB 1%]                                                                                                          1245 kB/s 49s25% [2 golang-1.19-go 2200 kB/62.7 MB 4%]                                                                                                         1245 kB/s 48s25% [2 golang-1.19-go 2215 kB/62.7 MB 4%]                                                                                                         1245 kB/s 48s26% [2 golang-1.19-go 3186 kB/62.7 MB 5%]                                                                                                         1245 kB/s 47s27% [2 golang-1.19-go 4344 kB/62.7 MB 7%]                                                                                                         1245 kB/s 46s28% [2 golang-1.19-go 4811 kB/62.7 MB 8%]                                                                                                         1245 kB/s 46s29% [2 golang-1.19-go 5823 kB/62.7 MB 9%]                                                                                                         1245 kB/s 45s30% [2 golang-1.19-go 7008 kB/62.7 MB 11%]                                                                                                        1245 kB/s 44s31% [2 golang-1.19-go 7758 kB/62.7 MB 12%]                                                                                                        1245 kB/s 44s31% [2 golang-1.19-go 8005 kB/62.7 MB 13%]                                                                                                        1245 kB/s 43s31% [2 golang-1.19-go 8016 kB/62.7 MB 13%]                                                                                                        1430 kB/s 38s33% [2 golang-1.19-go 10.1 MB/62.7 MB 16%]                                                                                                        1430 kB/s 36s33% [2 golang-1.19-go 10.1 MB/62.7 MB 16%]                                                                                                        1430 kB/s 36s33% [2 golang-1.19-go 10.1 MB/62.7 MB 16%]                                                                                                        1430 kB/s 36s34% [2 golang-1.19-go 11.3 MB/62.7 MB 18%]                                                                                                        1430 kB/s 35s35% [2 golang-1.19-go 11.6 MB/62.7 MB 19%]                                                                                                        1430 kB/s 35s36% [2 golang-1.19-go 13.0 MB/62.7 MB 21%]                                                                                                        1430 kB/s 34s37% [2 golang-1.19-go 14.2 MB/62.7 MB 23%]                                                                                                        1430 kB/s 33s37% [2 golang-1.19-go 14.2 MB/62.7 MB 23%]                                                                                                        1430 kB/s 33s39% [2 golang-1.19-go 16.3 MB/62.7 MB 26%]                                                                                                        1430 kB/s 32s40% [2 golang-1.19-go 17.5 MB/62.7 MB 28%]                                                                                                        1430 kB/s 31s41% [2 golang-1.19-go 18.5 MB/62.7 MB 30%]                                                                                                        1430 kB/s 30s41% [2 golang-1.19-go 18.5 MB/62.7 MB 30%]                                                                                                        1703 kB/s 25s41% [2 golang-1.19-go 18.5 MB/62.7 MB 30%]                                                                                                        1703 kB/s 25s43% [2 golang-1.19-go 19.9 MB/62.7 MB 32%]                                                                                                        1703 kB/s 25s43% [2 golang-1.19-go 20.5 MB/62.7 MB 33%]                                                                                                        1703 kB/s 24s43% [2 golang-1.19-go 20.5 MB/62.7 MB 33%]                                                                                                        1703 kB/s 24s43% [2 golang-1.19-go 20.7 MB/62.7 MB 33%]                                                                                                        1703 kB/s 24s47% [2 golang-1.19-go 23.9 MB/62.7 MB 38%]                                                                                                        1703 kB/s 22s48% [2 golang-1.19-go 25.7 MB/62.7 MB 41%]                                                                                                        1703 kB/s 21s49% [2 golang-1.19-go 26.2 MB/62.7 MB 42%]                                                                                                        1703 kB/s 21s49% [2 golang-1.19-go 26.2 MB/62.7 MB 42%]                                                                                                        1703 kB/s 21s49% [2 golang-1.19-go 26.2 MB/62.7 MB 42%]                                                                                                        1703 kB/s 21s52% [2 golang-1.19-go 29.2 MB/62.7 MB 47%]                                                                                                        1665 kB/s 20s55% [2 golang-1.19-go 32.4 MB/62.7 MB 52%]                                                                                                        1665 kB/s 18s57% [2 golang-1.19-go 34.4 MB/62.7 MB 55%]                                                                                                        1665 kB/s 17s60% [2 golang-1.19-go 36.9 MB/62.7 MB 59%]                                                                                                        1665 kB/s 15s60% [2 golang-1.19-go 36.9 MB/62.7 MB 59%]                                                                                                        1665 kB/s 15s60% [2 golang-1.19-go 37.7 MB/62.7 MB 60%]                                                                                                        1665 kB/s 15s61% [2 golang-1.19-go 38.2 MB/62.7 MB 61%]                                                                                                        1665 kB/s 14s63% [2 golang-1.19-go 40.4 MB/62.7 MB 64%]                                                                                                        1665 kB/s 13s63% [2 golang-1.19-go 40.5 MB/62.7 MB 65%]                                                                                                        1665 kB/s 13s64% [2 golang-1.19-go 41.4 MB/62.7 MB 66%]                                                                                                        1665 kB/s 12s64% [2 golang-1.19-go 41.8 MB/62.7 MB 67%]                                                                                                        1665 kB/s 12s65% [2 golang-1.19-go 42.0 MB/62.7 MB 67%]                                                                                                        1665 kB/s 12s66% [2 golang-1.19-go 43.5 MB/62.7 MB 69%]                                                                                                         2219 kB/s 8s67% [2 golang-1.19-go 44.0 MB/62.7 MB 70%]                                                                                                         2219 kB/s 8s67% [2 golang-1.19-go 44.0 MB/62.7 MB 70%]                                                                                                         2219 kB/s 8s67% [2 golang-1.19-go 44.3 MB/62.7 MB 71%]                                                                                                         2219 kB/s 8s67% [2 golang-1.19-go 44.3 MB/62.7 MB 71%]                                                                                                         2219 kB/s 8s67% [2 golang-1.19-go 44.3 MB/62.7 MB 71%]                                                                                                         2219 kB/s 8s67% [2 golang-1.19-go 44.5 MB/62.7 MB 71%]                                                                                                         2219 kB/s 8s69% [2 golang-1.19-go 47.0 MB/62.7 MB 75%]                                                                                                         2219 kB/s 7s72% [2 golang-1.19-go 49.2 MB/62.7 MB 78%]                                                                                                         2219 kB/s 6s72% [2 golang-1.19-go 49.2 MB/62.7 MB 78%]                                                                                                         2219 kB/s 6s73% [2 golang-1.19-go 50.3 MB/62.7 MB 80%]                                                                                                         2219 kB/s 5s74% [2 golang-1.19-go 51.2 MB/62.7 MB 82%]                                                                                                         1192 kB/s 9s74% [2 golang-1.19-go 51.6 MB/62.7 MB 82%]                                                                                                         1192 kB/s 9s74% [2 golang-1.19-go 51.8 MB/62.7 MB 83%]                                                                                                         1192 kB/s 9s74% [2 golang-1.19-go 51.8 MB/62.7 MB 83%]                                                                                                         1192 kB/s 9s74% [2 golang-1.19-go 51.8 MB/62.7 MB 83%]                                                                                                         1192 kB/s 9s74% [2 golang-1.19-go 51.8 MB/62.7 MB 83%]                                                                                                         1192 kB/s 9s74% [2 golang-1.19-go 51.8 MB/62.7 MB 83%]                                                                                                         1192 kB/s 9s81% [2 golang-1.19-go 59.2 MB/62.7 MB 94%]                                                                                                         1192 kB/s 3s85% [2 golang-1.19-go 62.4 MB/62.7 MB 100%]                                                                                                        1192 kB/s 0s85% [2 golang-1.19-go 62.6 MB/62.7 MB 100%]                                                                                                        1192 kB/s 0s90% [Working]                                                                                                                                      1192 kB/s 0s                                                                                                                                                               Get:3 http://deb.debian.org/debian bookworm/main amd64 golang-src all 2:1.19~1 [5756 B]
+90% [3 golang-src 0 B/5756 B 0%]                                                                                                                   1192 kB/s 0s95% [Working]                                                                                                                                      1192 kB/s 0s                                                                                                                                                               Get:4 http://deb.debian.org/debian bookworm/main amd64 golang-go amd64 2:1.19~1 [45.0 kB]
+95% [4 golang-go 0 B/45.0 kB 0%]                                                                                                                   1192 kB/s 0s100% [Working]                                                                                                                                     1192 kB/s 0s                                                                                                                                                               Fetched 81.1 MB in 1min 8s (1191 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package golang-1.19-src.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 15751 files and directories currently installed.)
+Preparing to unpack .../golang-1.19-src_1.19.8-2_all.deb ...
+Unpacking golang-1.19-src (1.19.8-2) ...
+ls -la /usr/bin/go 2>/dev/null || true
+/usr/local/go/bin/go version
+/usr/bin/go version 2>/dev/null || true
+export PATH=/usr/local/go/bin:$PATH
+go version
+go test ./...
+mkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger
+
+Selecting previously unselected package golang-1.19-go.
+Preparing to unpack .../golang-1.19-go_1.19.8-2_amd64.deb ...
+Unpacking golang-1.19-go (1.19.8-2) ...
+
+echo "APT status check"; ps -ef | grep -E 'apt-get|dpkg' | grep -v grep || true
+ls -la /usr/bin/go /usr/local/go/bin/go 2>/dev/null || true
+/usr/local/go/bin/go version
+/usr/bin/go version 2>/dev/null || true
+export PATH=/usr/local/go/bin:$PATH
+go version
+go test ./...
+mkdir -p /app/bin
+go build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger
+
+Selecting previously unselected package golang-src.
+Preparing to unpack .../golang-src_2%3a1.19~1_all.deb ...
+Unpacking golang-src (2:1.19~1) ...
+Selecting previously unselected package golang-go:amd64.
+Preparing to unpack .../golang-go_2%3a1.19~1_amd64.deb ...
+Unpacking golang-go:amd64 (2:1.19~1) ...
+Setting up golang-1.19-src (1.19.8-2) ...
+Setting up golang-src (2:1.19~1) ...
+Setting up golang-1.19-go (1.19.8-2) ...
+Setting up golang-go:amd64 (2:1.19~1) ...
+[?2004hroot@832c1bca13a1:/app# 
+[?2004l[?2004hroot@832c1bca13a1:/app# 
+[?2004l[?2004hroot@832c1bca13a1:/app# ps -ef | grep -E 'apt-get|dpkg' | grep -v grep || true
+[?2004l[?2004hroot@832c1bca13a1:/app# export PATH=/usr/local/go/bin:$PATH
+[?2004l[?2004hroot@832c1bca13a1:/app# go version
+[?2004lgo version go1.22.2 linux/amd64
+[?2004hroot@832c1bca13a1:/app# go test ./...
+[?2004lgo build -o /app/bin/ledger ./cmd/ledger
+/app/bin/ledger
+ps -ef | grep -E '\bgo( |$)' | grep -v grep || true
+^C
+[?2004hroot@832c1bca13a1:/app# go test ./...
+[?2004lgo build -o /app/bin/ledger ./cmd/ledger
+ls -la /app/bin/ledger
+/app/bin/ledger | cat -A
+?   	ledger.local/harbor/cmd/ledger	[no test files]
+ok  	ledger.local/harbor/pkg/math	0.097s
+[?2004hroot@832c1bca13a1:/app# go build -o /app/bin/ledger ./cmd/ledger
+[?2004l[?2004hroot@832c1bca13a1:/app# ls -la /app/bin/ledger
+[?2004l-rwxr-xr-x 1 root root 1911534 Apr 20 03:58 /app/bin/ledger
+[?2004hroot@832c1bca13a1:/app# /app/bin/ledger | cat -A
+[?2004lledger: ready (42)$
+[?2004hroot@832c1bca13a1:/app# go test ./...; echo "go test exit=$?"
+[?2004l?   	ledger.local/harbor/cmd/ledger	[no test files]
+ok  	ledger.local/harbor/pkg/math	(cached)
+go test exit=0
+[?2004hroot@832c1bca13a1:/app# go build -o /app/bin/ledger ./cmd/ledger; echo "go build exit=$?"
+[?2004lgo build exit=0
+[?2004hroot@832c1bca13a1:/app# test -x /app/bin/ledger && echo "ledger exists" || (echo "ledger missing"; exit 1)
+[?2004lledger exists
+[?2004hroot@832c1bca13a1:/app# /app/bin/ledger
+[?2004lledger: ready (42)
+[?2004hroot@832c1bca13a1:/app# /app/bin/ledger | cat -A
+[?2004lledger: ready (42)$
+[?2004hroot@832c1bca13a1:/app# 
