@@ -7,7 +7,6 @@ export DEBIAN_FRONTEND=noninteractive
 mkdir -p /logs/verifier
 echo 0 > /logs/verifier/reward.txt
 
-# Harbor may invoke this script with PWD=/; `go` still needs the module root as CWD.
 if [ ! -d /app ]; then
   echo "Error: /app is missing (broken task image)."
   exit 1

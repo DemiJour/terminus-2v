@@ -1,0 +1,6 @@
+#pragma once
+#include <string_view>
+
+inline std::string_view build_profile() {
+    return "@CMAKE_BUILD_TYPE@";
+}

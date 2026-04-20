@@ -1,0 +1,1 @@
+Engine orchestrates core helpers and uses the standard library thread facility for a small parallel transform.
