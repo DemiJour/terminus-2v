@@ -1,6 +1,6 @@
 Use `git bisect` under `/app/repo` to find when a very specific bug marker first showed up.
 
-Somewhere in history, someone added a single line to the main source file under `src/` (in this environment that is `src/main.go`) that is **exactly** `BUG_INTRODUCED` (whole line, nothing else on that line). Use whichever of `src/main.go` or `src/main.py` exists in your checkout for bisecting and for `files_touched`.
+Somewhere in history, someone added a single line to the main source file under `src/` (in this environment that is `src/main.cpp`) that is **exactly** `BUG_INTRODUCED` (whole line, nothing else on that line). Use whichever of `src/main.cpp`, `src/main.go`, or `src/main.py` exists in your checkout for bisecting and for `files_touched`.
 
 Other commits mention the same characters inside longer lines (for example `// BUG_INTRODUCED`, `REF: BUG_INTRODUCED`, or `BUG_INTRODUCED` with trailing spaces). Those are noise; only the standalone full line counts as the bug you are hunting.
 
@@ -18,6 +18,6 @@ Write `/app/report.json` with the same commit details plus metadata:
 }
 ```
 
-Sort `files_touched`, list each path once. Set `bug_line_is_exact` to true only if the traced `src/main.go` or `src/main.py` file at that commit actually contains a line that is exactly `BUG_INTRODUCED`.
+Sort `files_touched`, list each path once. Set `bug_line_is_exact` to true only if the traced `src/main.cpp` (or, in older setups, `src/main.go` / `src/main.py`) at that commit actually contains a line that is exactly `BUG_INTRODUCED`.
 
 Inspect history only; do not rewrite it. Absolute paths above are required.

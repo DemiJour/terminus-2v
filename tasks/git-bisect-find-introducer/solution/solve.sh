@@ -3,8 +3,11 @@ set -euo pipefail
 
 cd /app/repo
 
-# Track the real source path (src/main.go in current tasks; older cached images may still use src/main.py).
-MAIN=src/main.go
+# Prefer C++ source; fall back if an older task image still used Go or Python filenames.
+MAIN=src/main.cpp
+if [ ! -f "$MAIN" ]; then
+  MAIN=src/main.go
+fi
 if [ ! -f "$MAIN" ]; then
   MAIN=src/main.py
 fi

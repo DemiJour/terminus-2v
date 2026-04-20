@@ -7,8 +7,7 @@ export DEBIAN_FRONTEND=noninteractive
 mkdir -p /logs/verifier
 echo 0 > /logs/verifier/reward.txt
 
-# Prefer curl from the task image (see environment/Dockerfile) so we skip a full apt-get cycle,
-# which keeps the verifier short and avoids races with flaky Docker stop/teardown on some hosts.
+# Install curl when missing so the uv installer can run (pinned in the command below).
 if ! command -v curl >/dev/null 2>&1; then
   apt-get update
   apt-get install -y --no-install-recommends curl ca-certificates
