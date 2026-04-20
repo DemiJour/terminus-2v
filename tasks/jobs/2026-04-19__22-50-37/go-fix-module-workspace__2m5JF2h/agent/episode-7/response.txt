@@ -1,6 +1,0 @@
-{
-  "analysis": "All success criteria are now met. go.mod has module path `ledger.local/harbor` and `go 1.22`. go.work lists only `.`. `go test ./...` succeeded. Build command `go build -o /app/bin/ledger ./cmd/ledger` succeeded and produced /app/bin/ledger. Running the binary prints exactly one line: `ledger: ready (42)` with no extra whitespace.",
-  "plan": "No further changes required.",
-  "commands": [],
-  "task_complete": true
-}

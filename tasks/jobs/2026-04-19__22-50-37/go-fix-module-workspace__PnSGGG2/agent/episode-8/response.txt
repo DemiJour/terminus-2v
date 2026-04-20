@@ -1,6 +1,0 @@
-{
-  "analysis": "All success criteria are met: go.mod module path is ledger.local/harbor with go 1.22 preserved; go.work uses only '.'; `go test ./...` exits 0; `go build -o /app/bin/ledger ./cmd/ledger` exits 0 and produces an executable at /app/bin/ledger; running it prints exactly one line `ledger: ready (42)` with a trailing newline and no extra whitespace.",
-  "plan": "No further changes required.",
-  "commands": [],
-  "task_complete": true
-}

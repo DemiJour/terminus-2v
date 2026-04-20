@@ -1,8 +1,0 @@
-New Terminal Output:
-
-/app/bin/ledger
-go test ./...
-go build -o /app/bin/ledger ./cmd/ledger
-/app/bin/ledger
-ls -la /app/bin/ledger
-
