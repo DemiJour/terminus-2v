@@ -1,0 +1,1 @@
+High-level layout: core (static), engine (static, uses threads), plugin (object), app binaries.

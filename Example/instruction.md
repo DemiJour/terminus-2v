@@ -1,49 +1,167 @@
 Task Name
-fix-broken-git
+aws-localstack-event-pipeline
 Instructions
-YOUR MAIN DELIVERABLE: Create /app/repair_report.txt documenting how you fixed the broken git submodules.
+You are working inside a single Docker container at /app. Your task is to
+provision an AWS-like event ingestion pipeline on LocalStack and verify it
+end-to-end.
 
-TASK:
-1. Navigate to /app/broken-repo and fix the broken git submodules
-2. The correct repository URLs are: file:///app/repos/lib-a.git, lib-b.git, lib-c.git
-3. Fix bare repos: Ensure HEAD points to refs/heads/main or refs/heads/master
-4. Synchronize git config with .gitmodules, deinitialize and reinitialize submodules
-5. Fix detached HEAD: cd into each submodule (submodule-a, submodule-b, submodule-c) and checkout main or master branch
-6. Verify with a fresh clone to /app/clone_test with --recurse-submodules
-7. Commit your fixes with "submodule" in the message (working tree must be clean except .gitmodules.broken)
+LocalStack emulates AWS services on:
+    http://localstack:4566
+in region:
+    us-east-1
 
-CREATE /app/repair_report.txt with EXACTLY these sections:
+LocalStack is provided as a separate "localstack" service via docker-compose
+and will be started for you by the harness. You do NOT need to run Docker or
+docker compose commands yourself. However, you MUST wait until LocalStack is
+ready before creating resources. A simple way is to poll an AWS CLI command
+against LocalStack until it succeeds, for example:
 
-Step 1: Diagnosis - Document broken state (include: broken/before, and explanation words like why/because/cause/reason/affect/impact/problem)
-Step 2: Valid URLs - How you found correct URLs (include: investigate/search/found/discover/look/check/inspect/examine or mention /app/repos)
-Step 3: Fixing .gitmodules - Show BEFORE and AFTER (include: before/broken, after/fixed, file://)
-Step 4: Configuration Sync - Show BEFORE and AFTER git config (include: before/config, after/sync, explanation with why/drift/inconsistent/mismatch/conflict/necessary/required/synchronize)
-Step 5: Deinitialization - Document deinit process (section required)
-Step 6: Reinitialization - Document reinit process (section required)
-Step 7: Branch Verification - Verify submodules (submodule-a, submodule-b, submodule-c) are on branches, show symbolic-ref output with refs/heads/
-Step 8: Fresh Clone Verification - Show clone to /app/clone_test succeeded
-Step 9: Content Integrity Validation - MANDATORY section: Verify README.md in submodules (submodule-a, submodule-b, submodule-c) using checksums (MUST use md5sum or sha256sum commands, include: md5/sha256/hash/checksum, integrity/verify/ensure)
+    aws --endpoint-url http://localstack:4566 --region us-east-1 s3 ls
 
-Summary - MANDATORY section with checkmarks (✓) for EACH step. Must include these keywords with checkmarks:
-  ✓ Diagnosis (or Diagnosed)
-  ✓ URL (or URLs)
-  ✓ .gitmodules (or gitmodules)
-  ✓ Config (or Configuration)
-  ✓ Deinit (or Deinitialized)
-  ✓ Reinit (or Reinitialized)
-  ✓ Branch (or Branches)
-  ✓ Clone (or Cloned)
-  ✓ Integrity (or Validated)
+Very important: all AWS API calls in this task MUST talk to LocalStack, not
+real AWS. Every AWS CLI or Terraform call that interacts with S3, SNS, SQS,
+or IAM MUST explicitly use this LocalStack endpoint and region:
+    - Endpoint:  http://localstack:4566
+    - Region:    us-east-1
 
-End Summary with "Repair completed successfully"
+In AWS CLI, always include:
+    --endpoint-url http://localstack:4566 --region us-east-1
 
-Include in report: complex corruption terms (corrupt/deinit/modules/clean/repair) and Git plumbing commands (symbolic-ref/show-ref/rev-parse/fsck/cat-file/update-ref).
+In Terraform, configure the provider with endpoints mapping S3, SNS, SQS,
+and IAM to http://localstack:4566 and region us-east-1.
 
-KEY REQUIREMENTS:
-- Remove broken URLs from .gitmodules (github.com/nonexistent-org, git@broken-server.example.com, gitlab.com/removed)
-- Backup .gitmodules to .gitmodules.broken before changes
-- Fix bare repos: lib-a.git and lib-c.git need HEAD on refs/heads/main or master, lib-b.git needs main branch
-- Submodule paths: submodule-a, submodule-b, submodule-c (each has README.md and index.js)
-- Working tree must be clean after commit (only .gitmodules.broken allowed)
+You may use AWS CLI, Terraform, or both. The final system state must satisfy
+*all* requirements below.
 
-REMEMBER: The file /app/repair_report.txt is your MAIN OUTPUT and MUST be created!
+1. Start LocalStack
+   -------------------------------------------------
+   LocalStack must be running and serving the following services:
+     - S3
+     - SNS
+     - SQS
+     - IAM
+
+   All calls must target:
+     --endpoint-url http://localstack:4566
+     --region us-east-1
+
+   Ensure LocalStack is fully ready (for example by polling "aws s3 ls"
+   against the LocalStack endpoint) before you start creating resources.
+
+2. Create the S3 bucket
+   -------------------------------------------------
+   Create a bucket named:
+     tb-events-bucket
+   in region us-east-1 with:
+     - Versioning enabled
+     - Default server-side encryption using SSE-S3 (AES256)
+
+3. Create SNS + SQS resources
+   -------------------------------------------------
+   Create:
+     - SNS topic:  tb-events-topic
+     - SQS queue:  tb-main-queue
+     - SQS DLQ:    tb-dlq
+
+   Configure tb-main-queue with a redrive policy sending failed messages
+   to tb-dlq.
+
+4. Event wiring: S3 → SNS → SQS
+   -------------------------------------------------
+   Configure the following pipeline:
+
+     S3 bucket "tb-events-bucket"
+         (ObjectCreated:* events)
+         → SNS topic "tb-events-topic"
+         → SQS queue "tb-main-queue"
+
+   A notification published to the SNS topic MUST appear as a message
+   in tb-main-queue.
+
+   LocalStack must deliver the *standard SNS notification envelope* to SQS,
+   meaning the SQS message Body is a JSON string containing:
+     {
+       "Type": "Notification",
+       "Message": "<S3 Event JSON>",
+       ...
+     }
+
+5. Create restricted IAM user
+   -------------------------------------------------
+   Create an IAM user named:
+     tb-uploader
+
+   Grant the user ONLY the following permissions:
+
+     Allowed:
+       - ListBucket on tb-events-bucket
+       - GetObject and PutObject under prefix:
+            incoming/*
+     Denied:
+       - PutObject outside the incoming/ prefix
+
+   Create an access key for this user and save the
+   FULL JSON output of:
+       aws iam create-access-key
+   into:
+
+       /app/uploader-credentials.json
+
+6. Upload an object using only tb-uploader credentials
+   -------------------------------------------------
+   A file exists at:
+       /app/upload_body.txt
+
+   Using ONLY the credentials inside /app/uploader-credentials.json,
+   upload a new object:
+
+       bucket: tb-events-bucket
+       key: incoming/test-object.txt
+       body: exactly the contents of upload_body.txt
+
+   You may use any standard method to feed these credentials to the AWS CLI.
+   For example, you can parse /app/uploader-credentials.json and export:
+
+       AWS_ACCESS_KEY_ID=<AccessKey.AccessKeyId>
+       AWS_SECRET_ACCESS_KEY=<AccessKey.SecretAccessKey>
+       AWS_DEFAULT_REGION=us-east-1
+
+   Before running the S3 upload command. The key requirement is that the
+   upload is performed with the tb-uploader identity, not the default test
+   credentials.
+
+   This upload must succeed (IAM allows the prefix incoming/).
+
+7. End-to-end validation: must produce a queue message
+   -------------------------------------------------
+   The above upload MUST trigger:
+
+       S3 → SNS → SQS
+
+   At least one unconsumed message MUST exist in:
+       tb-main-queue
+
+   The SQS message MUST contain the SNS notification JSON envelope
+   referencing:
+     - TopicArn of tb-events-topic
+     - S3 event with:
+         bucket.name == "tb-events-bucket"
+         object.key starts with "incoming/"
+
+   In practice, there may be a short delay between writing the object to S3
+   and the message appearing in tb-main-queue. Your solution may need to
+   poll the SQS queue for a few seconds (for example using receive-message
+   in a loop with a small sleep) to allow the S3 → SNS → SQS pipeline to
+   complete.
+
+Final success requires that ALL of the following must be true:
+   -------------------------------------------------
+   - LocalStack is running and reachable at http://localstack:4566 in region us-east-1.
+   - tb-events-bucket exists with versioning + SSE-S3.
+   - tb-events-topic, tb-main-queue, tb-dlq all exist and are wired correctly.
+   - IAM user tb-uploader exists with correct prefix-restricted permissions.
+   - /app/uploader-credentials.json exists with valid access key material.
+   - Uploading incoming/test-object.txt via tb-uploader produced an SNS
+     message that arrived in tb-main-queue, with a standard SNS envelope
+     containing an inner S3 event JSON referencing tb-events-bucket and an
+     object key starting with incoming/.

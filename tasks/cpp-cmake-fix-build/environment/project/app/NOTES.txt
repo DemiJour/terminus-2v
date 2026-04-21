@@ -1,0 +1,1 @@
+Executables consume engine and plugin; build_profile.h is generated from build_profile.h.in at configure time.

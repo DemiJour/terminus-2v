@@ -1,0 +1,21 @@
+# Harbor uses this file as the *entire* Compose project. Mirror the stock task layout (single
+# `main` service + build context + volumes). LocalStack runs inside the same image — do not add a
+# second `localstack` service (that pattern caused RuntimeError with multi-container harness wiring).
+services:
+  main:
+    build:
+      context: ${CONTEXT_DIR}
+    image: ${MAIN_IMAGE_NAME}
+    command: [ "sh", "-c", "sleep infinity" ]
+    environment:
+      - TEST_DIR=${TEST_DIR}
+      - AWS_DEFAULT_REGION=us-east-1
+      - SERVICES=s3,sns,sqs,iam
+    volumes:
+      - ${HOST_VERIFIER_LOGS_PATH}:${ENV_VERIFIER_LOGS_PATH}
+      - ${HOST_AGENT_LOGS_PATH}:${ENV_AGENT_LOGS_PATH}
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPUS}
+          memory: ${MEMORY}
