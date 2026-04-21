@@ -1,0 +1,26 @@
+LocalStack + AWS CLI — suggested order (same endpoint/region everywhere)
+
+1) Wait until `aws ... s3 ls` works against http://127.0.0.1:4566
+
+2) S3: create tb-events-bucket; turn on versioning; set default bucket encryption AES256.
+
+3) SQS: create tb-dlq first. Run get-queue-attributes for tb-dlq and copy QueueArn.
+
+4) SQS: create tb-main-queue with RedrivePolicy on create (or set-queue-attributes after). The RedrivePolicy value must be a JSON string with deadLetterTargetArn = the tb-dlq ARN and maxReceiveCount (e.g. "5").
+
+5) SNS: create tb-events-topic; note TopicArn.
+
+6) SQS: set-queue-attributes on tb-main-queue with a Policy that allows sns:SendMessage from the SNS topic (Principal * and Condition aws:SourceArn = TopicArn is common).
+
+7) SNS: subscribe the main queue to the topic (protocol sqs, endpoint = main queue ARN).
+
+8) IAM: create IAM user tb-uploader with inline policy for ListBucket on the bucket ARN and GetObject/PutObject on arn:aws:s3:::tb-events-bucket/incoming/* only.
+
+9) Keys: write access keys with shell redirection so the file is real JSON, not empty:
+   aws iam create-access-key --user-name tb-uploader --output json > /app/uploader-credentials.json
+
+10) C++: cmake -S /app/cpp_upload -B /app/cpp_upload/build && cmake --build /app/cpp_upload/build
+
+11) Upload: export AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY from that JSON; presign a PUT for s3://tb-events-bucket/incoming/test-object.txt; run /app/cpp_upload/build/s3_put URL /app/upload_body.txt
+
+12) Message in queue: after the SNS→SQS subscription exists, you still need a notification on the topic. A PUT to S3 alone does not reliably show up as the required SNS-wrapped S3 event in tb-main-queue. Publish a JSON message to the topic whose body matches an S3 notification event (Records[0].s3.bucket.name and object.key under incoming/).

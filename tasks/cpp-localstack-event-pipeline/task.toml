@@ -1,0 +1,30 @@
+version = "2.0"
+
+[metadata]
+author_name = "anonymous"
+author_email = "anonymous"
+difficulty = "hard"
+category = "software-engineering"
+subcategories = [ "tool_specific", "api_integration" ]
+number_of_milestones = 0
+codebase_size = "small"
+languages = [ "c++", "cmake", "bash", "python" ]
+expert_time_estimate_min = 90
+junior_time_estimate_min = 180
+tags = [ "aws-cli", "localstack", "cmake", "libcurl", "c++17", "sns", "sqs", "s3" ]
+# Single Compose service (`main`); LocalStack runs inside that image (see environment/Dockerfile).
+is_multi_container = false
+custom_docker_compose = true
+
+[verifier]
+timeout_sec = 600.0
+
+[agent]
+timeout_sec = 1200.0
+
+[environment]
+build_timeout_sec = 900.0
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240
+allow_internet = true

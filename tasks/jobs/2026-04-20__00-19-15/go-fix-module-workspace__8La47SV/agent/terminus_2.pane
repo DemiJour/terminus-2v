@@ -1,108 +1,0 @@
-[?2004hroot@4280a541c03a:/app# asciinema rec --stdin /logs/agent/recording.cast
-[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
-[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
-[?2004hroot@4280a541c03a:/app# clear
-[?2004l[H[J[3J[?2004hroot@4280a541c03a:/app# cd /app
-[?2004l[?2004hroot@4280a541c03a:/app# ls -la
-[?2004ltotal 36
-drwxr-xr-x 1 root root 4096 Apr 20 03:40 .
-drwxr-xr-x 1 root root 4096 Apr 20 05:19 ..
-drwxr-xr-x 1 root root 4096 Apr 20 03:40 cmd
--rw-r--r-- 1 root root   44 Apr 20 03:40 go.mod
--rw-r--r-- 1 root root   39 Apr 20 03:40 go.work
-drwxr-xr-x 1 root root 4096 Apr 20 03:40 pkg
-[?2004hroot@4280a541c03a:/app# printf '--- go.mod ---\n'; cat go.mod; printf '\n--- go.work ---\n'; cat go.work
-[?2004lbash: printf: --: invalid option
-printf: usage: printf [-v var] format [arguments]
-module github.com/acme/wrongledger
-
-go 1.22
-
---- go.work ---
-go 1.22
-
-use (
-	.
-	./deprecated-pack
-)
-[?2004hroot@4280a541c03a:/app# perl -0777 -i -pe 's/^module\s+\S+/module ledger.local\/harbor/m' go.mod
-[?2004l[?2004hroot@4280a541c03a:/app# perl -0777 -i -pe 's/^go\s+\S+$/go 1.22/m' go.mod
-[?2004l[?2004hroot@4280a541c03a:/app# cat > go.work <<'EOF'
-[?2004l[?2004h> go 1.22
-[?2004l[?2004h> 
-[?2004l[?2004h> use (
-[?2004l[?2004h> .
-[?2004l[?2004h> )
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@4280a541c03a:/app# printf '--- fixed go.mod ---\n'; cat go.mod; printf '\n--- fixed go.work ---\n'; cat go.work
-[?2004lbash: printf: --: invalid option
-printf: usage: printf [-v var] format [arguments]
-module ledger.local/harbor
-
-go 1.22
-
---- fixed go.work ---
-go 1.22
-
-use (
-.
-)
-[?2004hroot@4280a541c03a:/app# go test ./...
-[?2004lbash: go: command not found
-[?2004hroot@4280a541c03a:/app# mkdir -p /app/bin
-[?2004l[?2004hroot@4280a541c03a:/app# go build -o /app/bin/ledger ./cmd/ledger
-[?2004lbash: go: command not found
-[?2004hroot@4280a541c03a:/app# /app/bin/ledger
-[?2004lbash: /app/bin/ledger: No such file or directory
-[?2004hroot@4280a541c03a:/app# command -v go || true
-[?2004l[?2004hroot@4280a541c03a:/app# ls -la /usr/local/go/bin/go /usr/lib/go/bin/go /usr/bin/go /bin/go 2>/dev/null || true
-[?2004l-rwxr-xr-x 1 root root 12684603 Mar 29  2024 /usr/local/go/bin/go
-[?2004hroot@4280a541c03a:/app# find / -maxdepth 4 -type f -name go -path '*/bin/go' 2>/dev/null | head -n 20
-[?2004l[?2004hroot@4280a541c03a:/app# if [ -x /usr/local/go/bin/go ]; then export PATH=/usr/local/go/bin:$PATH; fi; if [ -x /usr/lib/go/bin/go ]; then export PATH=/usr/lib/go/bin:$PATH; fi; if [ -x /usr/bin/go ]; then export PATH=/usr/bin:$PATH; fi; command -v go || true
-[?2004l/usr/local/go/bin/go
-[?2004hroot@4280a541c03a:/app# go version
-[?2004lgo version go1.22.2 linux/amd64
-[?2004hroot@4280a541c03a:/app# go test ./...
-[?2004lmkdir -p /app/bin
-go build -o /app/bin/ledger ./cmd/ledger
-/app/bin/ledger
-ps -ef | grep -E 'go test|\bgo\b' | grep -v grep || true
-^C
-[?2004hroot@4280a541c03a:/app# cd /app
-[?2004l[?2004hroot@4280a541c03a:/app# export PATH=/usr/local/go/bin:$PATH
-[?2004l[?2004hroot@4280a541c03a:/app# go test ./...; echo "go test exit=$?"
-[?2004lgo build -o /app/bin/ledger ./cmd/ledger
-/app/bin/ledger | cat -A
-?   	ledger.local/harbor/cmd/ledger	[no test files]
-ok  	ledger.local/harbor/pkg/math	0.006s
-go test exit=0
-[?2004hroot@4280a541c03a:/app# go build -o /app/bin/ledger ./cmd/ledger
-[?2004l[?2004hroot@4280a541c03a:/app# /app/bin/ledger | cat -A
-[?2004lledger: ready (42)$
-[?2004hroot@4280a541c03a:/app# C-c
-[?2004lbash: C-c: command not found
-[?2004hroot@4280a541c03a:/app# ps -ef | grep -E 'go test|\bgo\b' | grep -v grep || true
-[?2004l[?2004hroot@4280a541c03a:/app# export PATH=/usr/local/go/bin:$PATH
-[?2004l[?2004hroot@4280a541c03a:/app# cd /app
-[?2004l[?2004hroot@4280a541c03a:/app# rm -f /tmp/gotest.log; (go test ./... > /tmp/gotest.log 2>&1); ec=$?; echo "go test exit=$ec"; tail -n 50 /tmp/gotest.log
-[?2004lgo test exit=0
-?   	ledger.local/harbor/cmd/ledger	[no test files]
-ok  	ledger.local/harbor/pkg/math	(cached)
-[?2004hroot@4280a541c03a:/app# go build -o /app/bin/ledger ./cmd/ledger
-[?2004l[?2004hroot@4280a541c03a:/app# /app/bin/ledger | cat -A
-[?2004lledger: ready (42)$
-[?2004hroot@4280a541c03a:/app# ls -la /app/bin/ledger /app/go.mod /app/go.work
-[?2004l-rwxr-xr-x 1 root root 1911534 Apr 20 05:20 /app/bin/ledger
--rw-r--r-- 1 root root      36 Apr 20 05:20 /app/go.mod
--rw-r--r-- 1 root root      19 Apr 20 05:20 /app/go.work
-[?2004hroot@4280a541c03a:/app# cat /app/go.mod
-[?2004lmodule ledger.local/harbor
-
-go 1.22
-[?2004hroot@4280a541c03a:/app# cat /app/go.work
-[?2004lgo 1.22
-
-use (
-.
-)
-[?2004hroot@4280a541c03a:/app# 
