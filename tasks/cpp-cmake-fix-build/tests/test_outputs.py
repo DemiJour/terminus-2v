@@ -190,27 +190,72 @@ def test_no_generated_headers_in_source_tree():
     assert not (ROOT / "app" / "build_profile.h").exists()
 
 
-def test_compile_commands_show_cxx20():
-    """Require `compile_commands.json` entries for engine and app to use a C++20 standard flag."""
-    build_dir, _, _ = _build("Release")
-    compile_commands = build_dir / "compile_commands.json"
-    assert compile_commands.exists(), "compile_commands.json not generated"
-
-    entries = json.loads(compile_commands.read_text())
-    engine_entries = [e for e in entries if e["file"].endswith("/engine/engine.cpp")]
-    app_entries = [e for e in entries if e["file"].endswith("/app/main.cpp")]
-    assert engine_entries, "missing engine compile command"
-    assert app_entries, "missing app compile command"
+def _compile_command_texts_for_suffix(entries: list, path_suffix: str) -> str:
+    """Join compile command strings for entries whose file path ends with path_suffix."""
+    matched = [e for e in entries if e["file"].endswith(path_suffix)]
+    assert matched, f"missing compile command for *{path_suffix}"
 
     def _cmd(entry):
         if "command" in entry:
             return entry["command"]
         return " ".join(entry.get("arguments", []))
 
-    engine_cmd = "\n".join(_cmd(e) for e in engine_entries)
-    app_cmd = "\n".join(_cmd(e) for e in app_entries)
-    assert "-std=gnu++20" in engine_cmd or "-std=c++20" in engine_cmd
-    assert "-std=gnu++20" in app_cmd or "-std=c++20" in app_cmd
+    return "\n".join(_cmd(e) for e in matched)
+
+
+def _compile_command_uses_cpp17_mode(cmd: str) -> bool:
+    """
+    True when the compile line is not forcing C++20+ and either names C++17 explicitly or omits
+    -std= so a typical GCC default (gnu++17) satisfies CMake's cxx_std_17 without a redundant flag.
+    """
+    if "-std=gnu++20" in cmd or "-std=c++20" in cmd:
+        return False
+    if "-std=gnu++2a" in cmd or "-std=c++2a" in cmd:
+        return False
+    if "-std=gnu++23" in cmd or "-std=c++23" in cmd:
+        return False
+    if (
+        "-std=gnu++17" in cmd
+        or "-std=c++17" in cmd
+        or "-std=gnu++1z" in cmd
+        or "-std=c++1z" in cmd
+    ):
+        return True
+    if "-std=" in cmd:
+        return False
+    return True
+
+
+def _compile_command_uses_cpp20_mode(cmd: str) -> bool:
+    """True when the compile line explicitly selects C++20 or newer."""
+    if "-std=gnu++20" in cmd or "-std=c++20" in cmd:
+        return True
+    if "-std=gnu++2a" in cmd or "-std=c++2a" in cmd:
+        return True
+    if "-std=gnu++23" in cmd or "-std=c++23" in cmd:
+        return True
+    return False
+
+
+def test_compile_commands_reflect_per_target_standards():
+    """Verify compile_commands.json shows C++17 for core/plugin and C++20 for engine and app sources."""
+    build_dir, _, _ = _build("Release")
+    compile_commands = build_dir / "compile_commands.json"
+    assert compile_commands.exists(), "compile_commands.json not generated"
+
+    entries = json.loads(compile_commands.read_text())
+
+    core_cmd = _compile_command_texts_for_suffix(entries, "/core/core.cpp")
+    plugin_cmd = _compile_command_texts_for_suffix(entries, "/plugin/plugin.cpp")
+    engine_cmd = _compile_command_texts_for_suffix(entries, "/engine/engine.cpp")
+    main_cmd = _compile_command_texts_for_suffix(entries, "/app/main.cpp")
+    selfcheck_cmd = _compile_command_texts_for_suffix(entries, "/app/selfcheck.cpp")
+
+    assert _compile_command_uses_cpp17_mode(core_cmd), core_cmd
+    assert _compile_command_uses_cpp17_mode(plugin_cmd), plugin_cmd
+    assert _compile_command_uses_cpp20_mode(engine_cmd), engine_cmd
+    assert _compile_command_uses_cpp20_mode(main_cmd), main_cmd
+    assert _compile_command_uses_cpp20_mode(selfcheck_cmd), selfcheck_cmd
 
 
 def test_plugin_remains_object_library_and_is_consumed_as_objects():
@@ -286,20 +331,6 @@ def test_no_global_cxx_standard_setting():
     """Forbid project-wide `CMAKE_CXX_STANDARD` in the root CMakeLists (standards must be per-target)."""
     root_cmake = (ROOT / "CMakeLists.txt").read_text().lower()
     assert "cmake_cxx_standard" not in root_cmake
-
-
-def test_target_compile_features_are_declared():
-    """Assert each target declares the expected `target_compile_features` C++ standard levels."""
-    core_cmake = (ROOT / "core" / "CMakeLists.txt").read_text().lower()
-    plugin_cmake = (ROOT / "plugin" / "CMakeLists.txt").read_text().lower()
-    engine_cmake = (ROOT / "engine" / "CMakeLists.txt").read_text().lower()
-    app_cmake = (ROOT / "app" / "CMakeLists.txt").read_text().lower()
-
-    assert "target_compile_features(core public cxx_std_17)" in core_cmake
-    assert "target_compile_features(plugin public cxx_std_17)" in plugin_cmake
-    assert "target_compile_features(engine public cxx_std_20)" in engine_cmake
-    assert "target_compile_features(myapp private cxx_std_20)" in app_cmake
-    assert "target_compile_features(selfcheck private cxx_std_20)" in app_cmake
 
 
 def test_app_does_not_hardcode_plugin_include_path():

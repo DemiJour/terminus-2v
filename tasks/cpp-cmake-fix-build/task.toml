@@ -12,8 +12,6 @@ languages = [ "c++", "cmake" ]
 expert_time_estimate_min = 60
 junior_time_estimate_min = 180
 tags = [ "cmake", "c++", "ninja", "threads", "c++20", "object-library" ]
-is_multi_container = false
-custom_docker_compose = true
 
 [verifier]
 timeout_sec = 600.0
