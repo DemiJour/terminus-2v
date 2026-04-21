@@ -1,0 +1,1 @@
+Prefer out-of-source builds. Release and Debug should both produce myapp and selfcheck.

@@ -1,0 +1,1 @@
+Plugin supplies formatting helpers compiled as an object library for reuse in both executables.

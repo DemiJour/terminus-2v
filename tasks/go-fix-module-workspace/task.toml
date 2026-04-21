@@ -3,19 +3,17 @@ version = "2.0"
 [metadata]
 author_name = "Richard"
 author_email = "rickjmcwork@gmail.com"
-difficulty = "medium"
+difficulty = "hard"
 category = "build-and-dependency-management"
 subcategories = [ "tool_specific" ]
 number_of_milestones = 0
-codebase_size = "minimal"
-languages = [ "go", "bash", "python" ]
-expert_time_estimate_min = 15
-junior_time_estimate_min = 45
-tags = [ "go", "golang", "go-modules", "go-work", "fix-broken-build", "linux" ]
-primary_language = "Go"
-domain = "Build Systems & Dependencies"
-tool = "Go modules / workspace"
-task_type = "Fix Broken Build"
+codebase_size = "small"
+languages = [ "c++", "cmake" ]
+expert_time_estimate_min = 60
+junior_time_estimate_min = 180
+tags = [ "cmake", "c++", "ninja", "threads", "c++20", "object-library" ]
+is_multi_container = false
+custom_docker_compose = true
 
 [verifier]
 timeout_sec = 600.0
@@ -25,13 +23,6 @@ timeout_sec = 600.0
 
 [environment]
 build_timeout_sec = 600.0
-cpus = 1
-memory_mb = 2048
-storage_mb = 4096
-gpus = 0
-allow_internet = true
-mcp_servers = []
-
-[verifier.env]
-
-[solution.env]
+cpus = 2
+memory_mb = 4096
+storage_mb = 10240

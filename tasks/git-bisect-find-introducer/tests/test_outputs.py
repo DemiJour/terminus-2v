@@ -8,7 +8,7 @@ from pathlib import Path
 HASH_PATTERN = re.compile(r"^[0-9a-f]{40}\s*$")
 
 REPO = Path("/app/repo")
-SOURCE_CANDIDATES = ("src/main.go", "src/main.py")
+SOURCE_CANDIDATES = ("src/main.cpp", "src/main.go", "src/main.py")
 
 
 def _git(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -186,8 +186,12 @@ def test_report_json_schema_and_consistency() -> None:
     assert files == expected["files_touched"], (
         "report.files_touched must match git diff-tree for the answer commit"
     )
-    assert ("src/main.go" in files) or ("src/main.py" in files), (
-        "files_touched must list the traced source file (src/main.go or legacy src/main.py)"
+    assert (
+        ("src/main.cpp" in files)
+        or ("src/main.go" in files)
+        or ("src/main.py" in files)
+    ), (
+        "files_touched must list the traced source file (src/main.cpp or legacy src/main.go / src/main.py)"
     )
 
     assert report["bug_line_is_exact"] is True, "bug_line_is_exact must be true"
