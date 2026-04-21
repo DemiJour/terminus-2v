@@ -1,3 +1,4 @@
+import hashlib
 import json
 import re
 import shutil
@@ -5,6 +6,19 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path("/app")
+
+# Baseline digests for non-CMake sources (task ships broken CMake only).
+_IMMUTABLE_SOURCE_SHA256 = {
+    "core/core.cpp": "2f5820abd77e149805b2a5742101a076f59c8b8f88a4722abd033b90a2b5395f",
+    "core/core.h": "13ebac91f5fcaf8c68412684cc3d6a9e64744b3d4c59cbaa6753cca08cbe8c10",
+    "engine/engine.cpp": "497979a3e5d28a2217fe62a8d349e8017fd5e95b413a40eeb64f49541bed7c0f",
+    "engine/engine.h": "5b64a6acec2e7ed9b788b0d1cd856db00ed1d78e3f91569588c6b4241f0c7213",
+    "plugin/plugin.cpp": "d1caf22bcde5129c0a632d0021e686c2ed4b8ea7340c24cef109a4bd511a9cec",
+    "plugin/plugin.h": "7c674c1c6b4217df363ab614c76acffb1fc542918a12a9ee03ba3705d20fd99b",
+    "app/main.cpp": "89cbae85a610b55f6673c33673d6fd096620eefe69dfd2e320b8e275f1d18887",
+    "app/selfcheck.cpp": "327b6805c54db910fd2c1cc9fc25cbfe999800002607df887c12a6140e9a43e2",
+    "app/build_profile.h.in": "4d1333da1e6ae6221507d23d3a1395956fc0da2093d19cc72410ee7064ee5ac5",
+}
 
 _CACHE = {}
 
@@ -70,6 +84,14 @@ def _executable_links_plugin_in_target_link_libraries(app_cmake: str, exe: str) 
         if re.search(r"\bplugin\b", body, flags=re.IGNORECASE):
             return True
     return False
+
+
+def _assert_target_compile_feature(
+    cmake_text: str, target: str, visibility: str, std_feature: str, message: str
+) -> None:
+    """Require a target_compile_features(...) call, allowing CMake/Make formatting whitespace."""
+    pat = rf"target_compile_features\s*\(\s*{re.escape(target)}\s+{re.escape(visibility)}\s+{re.escape(std_feature)}\s*\)"
+    assert re.search(pat, cmake_text, flags=re.IGNORECASE | re.DOTALL), message
 
 
 def _executables_consume_plugin_target(app_cmake: str) -> bool:
@@ -290,16 +312,50 @@ def test_no_global_cxx_standard_setting():
 
 def test_target_compile_features_are_declared():
     """Assert each target declares the expected `target_compile_features` C++ standard levels."""
-    core_cmake = (ROOT / "core" / "CMakeLists.txt").read_text().lower()
-    plugin_cmake = (ROOT / "plugin" / "CMakeLists.txt").read_text().lower()
-    engine_cmake = (ROOT / "engine" / "CMakeLists.txt").read_text().lower()
-    app_cmake = (ROOT / "app" / "CMakeLists.txt").read_text().lower()
+    core_cmake = (ROOT / "core" / "CMakeLists.txt").read_text()
+    plugin_cmake = (ROOT / "plugin" / "CMakeLists.txt").read_text()
+    engine_cmake = (ROOT / "engine" / "CMakeLists.txt").read_text()
+    app_cmake = (ROOT / "app" / "CMakeLists.txt").read_text()
 
-    assert "target_compile_features(core public cxx_std_17)" in core_cmake
-    assert "target_compile_features(plugin public cxx_std_17)" in plugin_cmake
-    assert "target_compile_features(engine public cxx_std_20)" in engine_cmake
-    assert "target_compile_features(myapp private cxx_std_20)" in app_cmake
-    assert "target_compile_features(selfcheck private cxx_std_20)" in app_cmake
+    _assert_target_compile_feature(
+        core_cmake, "core", "PUBLIC", "cxx_std_17", "core must declare target_compile_features PUBLIC cxx_std_17"
+    )
+    _assert_target_compile_feature(
+        plugin_cmake,
+        "plugin",
+        "PUBLIC",
+        "cxx_std_17",
+        "plugin must declare target_compile_features PUBLIC cxx_std_17",
+    )
+    _assert_target_compile_feature(
+        engine_cmake,
+        "engine",
+        "PUBLIC",
+        "cxx_std_20",
+        "engine must declare target_compile_features PUBLIC cxx_std_20",
+    )
+    _assert_target_compile_feature(
+        app_cmake,
+        "myapp",
+        "PRIVATE",
+        "cxx_std_20",
+        "myapp must declare target_compile_features PRIVATE cxx_std_20",
+    )
+    _assert_target_compile_feature(
+        app_cmake,
+        "selfcheck",
+        "PRIVATE",
+        "cxx_std_20",
+        "selfcheck must declare target_compile_features PRIVATE cxx_std_20",
+    )
+
+
+def test_only_shipped_sources_unchanged_non_cmake():
+    """Enforce CMake-only edits: every shipped .cpp/.h/.in file must match the task baseline bytes."""
+    for rel, expected_hex in _IMMUTABLE_SOURCE_SHA256.items():
+        path = ROOT / rel
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        assert digest == expected_hex, f"unexpected change in {rel} (CMake-only task)"
 
 
 def test_app_does_not_hardcode_plugin_include_path():

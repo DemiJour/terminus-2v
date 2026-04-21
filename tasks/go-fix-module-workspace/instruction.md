@@ -1,42 +1,5 @@
-# Repair a regressed CMake build
+My C++ project under /app is split into core, engine, plugin, and app, and the CMake layout broke during that split—the sources are fine. Fix the build by editing only the CMakeLists.txt files under /app; do not change any .cpp, .h, or .in files. I need out-of-source configures and builds to succeed for Release and Debug with Unix Makefiles and again with Ninja, and both myapp and selfcheck must build and run in each case.
 
-I’ve got a small C++ project in `/app` that used to build fine, but after splitting it into `core`, `engine`, `plugin`, and `app`, the CMake setup got messy. The source files themselves are fine; the breakage is in the CMake wiring.
+After a Release build, running myapp should print exactly four lines in order: text: HELLO, hash: 0x05e918d2, valid: yes, profile: Release; selfcheck should print exactly selfcheck: ok (Release). For Debug, the last line of each program should say Debug instead of Release. The build profile should come from /app/app/build_profile.h.in via configure_file so the generated header exists in the build tree as build_profile.h and is not checked in under /app/app.
 
-Please fix the build configuration using only `CMakeLists.txt` changes. Don’t edit any `.cpp`, `.h`, or `.in` files.
-
-## Success criteria (what must work)
-
-- **Out-of-source builds** for **Release** and **Debug** succeed, and the same holds when using the **Ninja** generator.
-- **Both programs** `myapp` and `selfcheck` **build and run** for each configuration above.
-- **`myapp` stdout** (exact lines):
-
-```
-text: HELLO
-hash: 0x05e918d2
-valid: yes
-profile: <build type>
-```
-
-- **`selfcheck` stdout** (exact line):
-
-```
-selfcheck: ok (<build type>)
-```
-
-  where `<build type>` is `Release` or `Debug` matching the configuration you built.
-
-- **Build profile in the binary**: the profile string in that output must reflect the active build type. The project ships `/app/app/build_profile.h.in`; the configured header must appear in the **build tree** under the exact filename **`build_profile.h`** (one generated file per build directory, not committed under `/app/app` in the source tree).
-
-- **Headers and dependencies**
-  - Targets that include **`core`** headers must obtain them through **`core`’s usage requirements** (dependents should not need extra manual include roots for `core`).
-  - **`engine`** must **link `core`** for headers and symbols, and must use **CMake’s portable threading integration** (the imported threading target CMake defines for `find_package(Threads)`), not only ad‑hoc raw linker flags, so the build stays portable.
-  - **`plugin`** must remain an **object-style library** in the final graph, and **`myapp` / `selfcheck`** must **pull in `plugin`’s objects** through normal CMake target relationships (not by wiring include paths straight to the plugin source tree on the app targets).
-
-- **C++ language levels**
-  - **`core`** and **`plugin`** only need **C++17**-level language features for their sources.
-  - **`engine`**, **`myapp`**, and **`selfcheck`** need **C++20** for their sources (when compile commands are exported, the compile line for `/app/engine/engine.cpp` and `/app/app/main.cpp` should reflect a C++20 language mode).
-  - The **root** project must **not** pin a single global C++ standard for the whole tree; language levels must be **scoped to the targets** that need them.
-
-## Scope
-
-You may reorganize targets, `configure_file`, link lines, and generator choices as long as the outcomes above hold and you only change **`CMakeLists.txt`** files.
+Core headers should reach dependents through core’s usage requirements (PUBLIC include usage), engine should link core and should use find_package(Threads REQUIRED) with Threads::Threads instead of ad-hoc pthread flags, and plugin must stay an OBJECT library with myapp and selfcheck pulling it in through normal CMake target wiring (not by adding /app/plugin to include paths on the app targets). Do not set a project-wide CMAKE_CXX_STANDARD in /app/CMakeLists.txt; scope C++17 to core and plugin and C++20 to engine, myapp, and selfcheck with per-target settings so the exported compile commands for /app/engine/engine.cpp and /app/app/main.cpp show a C++20 standard flag.
