@@ -34,6 +34,15 @@ def _assert_mode_exactly_0755(path: str) -> None:
     assert got == 0o755, f"{path} must be exactly mode 0755 (rwxr-xr-x), got {oct(got)}"
 
 
+def _patch_logs_include_reloc_type_numbers(text: str) -> bool:
+    """Accept common log spellings for relocation type numbers (e.g. type=7, type: 6)."""
+    if re.search(r"type\s*[=:]\s*\d+", text):
+        return True
+    if re.search(r"\btype\b\s+\d+", text):
+        return True
+    return False
+
+
 _SINGLE_GO_IMPORT = re.compile(r'^\s*import\s+(?:[\w.]+\s+)?"([^"]+)"\s*$')
 _MULTI_GO_IMPORT_START = re.compile(r'^\s*import\s*\(\s*$')
 _MULTI_GO_IMPORT_LINE = re.compile(r'^\s*(?:[\w.]+\s+)?"([^"]+)"')
@@ -77,6 +86,8 @@ def test_setup_builds_harness_binaries():
     assert proc.returncode == 0, f"setup.sh failed:\n{proc.stdout}\n{proc.stderr}"
     assert Path("/app/test_program_with_wrapper").is_file()
     assert Path("/app/libmallocwrapper.so").is_file()
+    assert Path("/app/test_elf_no_malloc_sym").is_file()
+    assert Path("/app/test_elf_static_malloc").is_file()
 
 
 def test_got_patch_binary_builds():
@@ -144,8 +155,8 @@ def test_patch_then_run_shows_many_intercepts():
     assert mentions_symbols, (
         "successful patch should name symbols or dynamic symbol tables (e.g. dynsym, symtab)"
     )
-    assert re.search(r"type\s*=\s*\d+", combined_logs), (
-        "successful patch output must include relocation type numbers (e.g. type=7)"
+    assert _patch_logs_include_reloc_type_numbers(combined_logs), (
+        "successful patch output must include relocation type numbers (e.g. type=7 or type: 6)"
     )
     cl = combined_lower
     assert "wrote patched elf to" in cl, "stderr must log the output path with the required wrote-patched prefix"
@@ -188,7 +199,7 @@ def test_patch_with_default_wrapper_symbol_succeeds():
     patch = _run(["/app/got-patch", "/app/test_program_with_wrapper", out_elf])
     assert patch.returncode == 0, f"patch failed:\n{patch.stdout}\n{patch.stderr}"
     combined = patch.stdout + patch.stderr
-    assert re.search(r"type\s*=\s*\d+", combined), "patch output must include relocation type numbers"
+    assert _patch_logs_include_reloc_type_numbers(combined), "patch output must include relocation type numbers"
     low = combined.lower()
     assert "wrote patched elf to" in low and out_elf in combined
     assert "r_x86_64_jump_slot" in low and "r_x86_64_glob_dat" in low
@@ -199,20 +210,65 @@ def test_patch_with_default_wrapper_symbol_succeeds():
 
 
 def test_missing_wrapper_reports_error():
-    """Unknown wrapper symbol must yield a non-zero exit and an explanatory message."""
+    """Unknown wrapper symbol must fail with a message about the wrapper/replacement symbol."""
     _assert_setup_succeeded(_run(["bash", "/app/setup.sh"]))
     _assert_go_build_succeeded(_run(["go", "build", "-o", "/app/got-patch", "./cmd/got-patch"]))
     proc = _run(
         [
             "/app/got-patch",
             "/app/test_program_with_wrapper",
-            "/app/out_bad",
+            "/app/out_bad_wrapper",
             "definitely_missing_symbol_zzzzz",
         ]
     )
     assert proc.returncode != 0
     msg = (proc.stdout + proc.stderr).lower()
-    assert "not found" in msg or "missing" in msg or "no relocations" in msg
+    assert (
+        "wrapper" in msg
+        or "replacement" in msg
+        or "definitely_missing_symbol_zzzzz" in msg
+    )
+    assert "no relocations targeting" not in msg
+    assert "malloc symbol not found" not in msg
+
+
+def test_missing_malloc_symbol_reports_error():
+    """ELF with no dynamic malloc must fail; message must call out malloc, not relocations."""
+    _assert_setup_succeeded(_run(["bash", "/app/setup.sh"]))
+    _assert_go_build_succeeded(_run(["go", "build", "-o", "/app/got-patch", "./cmd/got-patch"]))
+    proc = _run(
+        [
+            "/app/got-patch",
+            "/app/test_elf_no_malloc_sym",
+            "/app/out_bad_malloc_sym",
+            "logged_malloc",
+        ]
+    )
+    assert proc.returncode != 0
+    msg = (proc.stdout + proc.stderr).lower()
+    assert "malloc" in msg
+    assert "not found" in msg or "missing" in msg or "no symbol" in msg
+    assert "no relocations targeting" not in msg
+
+
+def test_no_applicable_malloc_relocations_reports_error():
+    """Static-linked malloc user: malloc may exist but JUMP_SLOT/GLOB_DAT relocs for it must be absent."""
+    _assert_setup_succeeded(_run(["bash", "/app/setup.sh"]))
+    _assert_go_build_succeeded(_run(["go", "build", "-o", "/app/got-patch", "./cmd/got-patch"]))
+    proc = _run(
+        [
+            "/app/got-patch",
+            "/app/test_elf_static_malloc",
+            "/app/out_bad_reloc",
+            "logged_malloc",
+        ]
+    )
+    assert proc.returncode != 0
+    msg = (proc.stdout + proc.stderr).lower()
+    assert "malloc" in msg
+    assert "reloc" in msg
+    assert "no relocations" in msg or ("targeting" in msg and "malloc" in msg)
+    assert "malloc symbol not found" not in msg
 
 
 def test_patch_rejects_non_elf_or_truncated_input():
